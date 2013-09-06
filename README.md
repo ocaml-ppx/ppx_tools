@@ -62,3 +62,11 @@ produces the following class:
     
 dumpast.exe is a direct example of using genlifter.exe applied on the
 OCaml Parsetree definition itself.
+
+
+TODOs
+-----
+
+- Import and improve ppx_metaquot.exe.
+- Proper copyright notices.
+- Doc.

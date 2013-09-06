@@ -1,5 +1,13 @@
 (* Illustrate how to use AST lifting to create a pretty-printer *)
 
+(* TODOs:
+
+   - Support -pp and -ppx options.
+   - Support .mli files on the command line.
+
+*)
+ 
+
 open Outcometree
 
 let locs = ref (`Discard : [`Discard|`Underscore|`Keep])
