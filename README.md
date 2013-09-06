@@ -21,9 +21,13 @@ genlifter.exe
 
 This tool generates a virtual "lifter" class for one or several OCaml
 type constructors.  It does so by loading the .cmi files which define
-those types.  The generated lifter class expose one method for each
-type constructor passed on the command-line and for each type
-constructor accessible from them. As an example, calling:
+those types.  The generated lifter class exposes one method to "reify"
+type constructors passed on the command-line and other type
+constructors accessible from them.  The class is parametrized over the
+target type of the reification, and it must provide method to deal
+with basic types (int, string, char, int32, int64, nativeint) and data
+type builders (record, constr, tuple, list, array).  As an example,
+calling:
 
     ./genlifter.exe -I +compiler-libs Location.t
 
@@ -56,9 +60,5 @@ produces the following class:
               ("pos_cnum", (this#int pos_cnum))]
       end
     
-The class assumes some virtual methods for basic types (int, string,
-char, int32, int64, nativeint) and data type builders (record, constr,
-tuple, list, array).
-
 dumpast.exe is a direct example of using genlifter.exe applied on the
 OCaml Parsetree definition itself.
