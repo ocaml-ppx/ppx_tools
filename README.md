@@ -29,33 +29,33 @@ constructor accessible from them. As an example, calling:
 
 produces the following class:
 
-class virtual ['res] lifter =
-  object (this)
-    method lift_Location_t : Location.t -> 'res=
-      fun
-        { Location.loc_start = loc_start; Location.loc_end = loc_end;
-          Location.loc_ghost = loc_ghost }
-         ->
-        this#record "Location.t"
-          [("loc_start", (this#lift_Lexing_position loc_start));
-          ("loc_end", (this#lift_Lexing_position loc_end));
-          ("loc_ghost", (this#lift_bool loc_ghost))]
-    method lift_bool : bool -> 'res=
-      function
-      | false  -> this#constr "bool" ("false", [])
-      | true  -> this#constr "bool" ("true", [])
-    method lift_Lexing_position : Lexing.position -> 'res=
-      fun
-        { Lexing.pos_fname = pos_fname; Lexing.pos_lnum = pos_lnum;
-          Lexing.pos_bol = pos_bol; Lexing.pos_cnum = pos_cnum }
-         ->
-        this#record "Lexing.position"
-          [("pos_fname", (this#string pos_fname));
-          ("pos_lnum", (this#int pos_lnum));
-          ("pos_bol", (this#int pos_bol));
-          ("pos_cnum", (this#int pos_cnum))]
-  end
-
+    class virtual ['res] lifter =
+      object (this)
+        method lift_Location_t : Location.t -> 'res=
+          fun
+            { Location.loc_start = loc_start; Location.loc_end = loc_end;
+              Location.loc_ghost = loc_ghost }
+             ->
+            this#record "Location.t"
+              [("loc_start", (this#lift_Lexing_position loc_start));
+              ("loc_end", (this#lift_Lexing_position loc_end));
+              ("loc_ghost", (this#lift_bool loc_ghost))]
+        method lift_bool : bool -> 'res=
+          function
+          | false  -> this#constr "bool" ("false", [])
+          | true  -> this#constr "bool" ("true", [])
+        method lift_Lexing_position : Lexing.position -> 'res=
+          fun
+            { Lexing.pos_fname = pos_fname; Lexing.pos_lnum = pos_lnum;
+              Lexing.pos_bol = pos_bol; Lexing.pos_cnum = pos_cnum }
+             ->
+            this#record "Lexing.position"
+              [("pos_fname", (this#string pos_fname));
+              ("pos_lnum", (this#int pos_lnum));
+              ("pos_bol", (this#int pos_bol));
+              ("pos_cnum", (this#int pos_cnum))]
+      end
+    
 The class assumes some virtual methods for basic types (int, string,
 char, int32, int64, nativeint) and data type builders (record, constr,
 tuple, list, array).
