@@ -1,3 +1,7 @@
+(*  This file is part of the ppx_tools package.  It is released  *)
+(*  under the terms of the MIT license (see LICENSE file).       *)
+(*  Copyright 2013  Alain Frisch and LexiFi                      *)
+
 (* Illustrate how to use AST lifting to create a pretty-printer *)
 
 (* TODOs:
@@ -6,7 +10,6 @@
    - Support .mli files on the command line.
 
 *)
- 
 
 open Outcometree
 

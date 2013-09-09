@@ -1,3 +1,8 @@
+(*  This file is part of the ppx_tools package.  It is released  *)
+(*  under the terms of the MIT license (see LICENSE file).       *)
+(*  Copyright 2013  Alain Frisch and LexiFi                      *)
+
+
 (* Generate code to lift values of a certain type.
    This illustrates how to build fragments of Parsetree through
    Ast_helper and more local helper functions. *)

@@ -1,7 +1,7 @@
 ppx_tools
 =========
 
-Tools for authors of ppx rewriters.
+Tools for authors of ppx rewriters and other syntactic tools.
 
 dumpast.exe
 -----------
@@ -14,6 +14,26 @@ dump the resulting internal Parsetree representation.  Intended uses:
 
  - Create fragments of Parsetree to be copy-pasted into the source
    code of syntax-manipulating programs (such as ppx rewriters).
+
+Usage:
+ 
+  ocamlfind ppx_tools/dumpast.exe -e "1 + 2"
+
+
+
+ppx_metaquot.exe
+----------------
+
+A ppx filter to help writing programs which manipulate the Parsetree,
+by allowing the programmer to use concrete syntax for expressions
+creating Parsetree fragments and patterns deconstructing Parsetree
+fragments.  See the top of ppx_metaquot.ml for a description of the
+supported extensions.
+
+Usage:
+
+  ocamlfind -c -ppx "ocamlfind ppx_tools/ppx_metaquot.exe" my_ppx_code.ml
+
 
 
 genlifter.exe
@@ -61,22 +81,5 @@ produces the following class:
       end
     
 dumpast.exe is a direct example of using genlifter.exe applied on the
-OCaml Parsetree definition itself.
-
-
-ppx_metaquot.exe
-----------------
-
-A ppx filter to help writing programs which manipulate the Parsetree,
-by allowing the programmer to use concrete syntax for expressions
-creating Parsetree fragments and pattterns deconstruction Parsetree
-fragments.  See the top of ppx_metaquot.ml for a description of the
-supported extensions.
-
-
-
-TODOs
------
-
-- Proper copyright notices.
-- Doc.
+OCaml Parsetree definition itself.  ppx_metaquot.exe is another
+similar example.
