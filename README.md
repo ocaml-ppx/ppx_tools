@@ -64,9 +64,19 @@ dumpast.exe is a direct example of using genlifter.exe applied on the
 OCaml Parsetree definition itself.
 
 
+ppx_metaquot.exe
+----------------
+
+A ppx filter to help writing programs which manipulate the Parsetree,
+by allowing the programmer to use concrete syntax for expressions
+creating Parsetree fragments and pattterns deconstruction Parsetree
+fragments.  See the top of ppx_metaquot.ml for a description of the
+supported extensions.
+
+
+
 TODOs
 -----
 
-- Import and improve ppx_metaquot.exe.
 - Proper copyright notices.
 - Doc.
