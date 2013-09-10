@@ -17,7 +17,7 @@ genlifter.exe: genlifter.cmo
 	$(OCAMLC) $(COMPFLAGS) -o genlifter.exe ocamlcommon.cma genlifter.cmo
 
 dumpast.exe: ast_lifter.cmo dumpast.cmo
-	$(OCAMLC) $(COMPFLAGS) -o dumpast.exe ocamlcommon.cma ast_lifter.cmo dumpast.cmo
+	$(OCAMLC) $(COMPFLAGS) -o dumpast.exe ocamlcommon.cma ocamlbytecomp.cma ast_lifter.cmo dumpast.cmo
 
 
 ppx_metaquot.exe: ast_lifter.cmo ppx_metaquot.cmo

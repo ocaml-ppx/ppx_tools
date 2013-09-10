@@ -111,6 +111,9 @@ let usage =
   Printf.sprintf "%s [options] [.ml/.mli files]\n" Sys.argv.(0)
 
 let () =
-  Arg.parse (Arg.align args) show_file usage
+  try Arg.parse (Arg.align args) show_file usage
+  with exn ->
+    Errors.report_error Format.err_formatter exn;
+    exit 2
 
 
