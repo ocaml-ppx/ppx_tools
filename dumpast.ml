@@ -61,8 +61,16 @@ let show_pat = show (lift # lift_Parsetree_pattern) Parse.pattern
 let show_typ = show (lift # lift_Parsetree_core_type) Parse.core_type
 
 let show_file fn =
-  let ast = Pparse.file Format.err_formatter fn Parse.implementation Config.ast_impl_magic_number in
-  let v = lift # lift_Parsetree_structure ast in
+  let v =
+    if Filename.check_suffix fn ".mli" then
+      let ast = Pparse.file Format.err_formatter fn Parse.interface Config.ast_intf_magic_number in
+      lift # lift_Parsetree_signature ast
+    else if Filename.check_suffix fn ".ml" then
+      let ast = Pparse.file Format.err_formatter fn Parse.implementation Config.ast_impl_magic_number in
+      lift # lift_Parsetree_structure ast
+    else
+      failwith (Printf.sprintf "Don't know what to do with file %s" fn)
+  in
   Format.printf "%s@.==>@.%a@.=========@." fn !Oprint.out_value v
 
 let args =
@@ -100,7 +108,7 @@ let args =
   ]
 
 let usage =
-  Printf.sprintf "%s [options]\n" Sys.argv.(0)
+  Printf.sprintf "%s [options] [.ml/.mli files]\n" Sys.argv.(0)
 
 let () =
   Arg.parse (Arg.align args) show_file usage
