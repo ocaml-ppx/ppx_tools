@@ -26,6 +26,12 @@ Usage:
  
   ocamlfind ppx_tools/dumpast.exe -e "1 + 2"
 
+The tool can be used to show the Parsetree representation of small
+fragments of syntax passed on the command line (-e for expressions, -p
+for patterns, -t for type expressions) or for entire .ml/mli files.
+The standard -pp and -ppx options are supported, but only applied on
+whole files.  The tool has further option to control how location and
+attribute fields in the Parsetree should be displayed.
 
 
 ppx_metaquot.exe

@@ -61,12 +61,13 @@ let show_pat = show (lift # lift_Parsetree_pattern) Parse.pattern
 let show_typ = show (lift # lift_Parsetree_core_type) Parse.core_type
 
 let show_file fn =
+  Compenv.readenv Format.err_formatter Compenv.Before_compile;
   let v =
     if Filename.check_suffix fn ".mli" then
-      let ast = Pparse.file Format.err_formatter fn Parse.interface Config.ast_intf_magic_number in
+      let ast = Pparse.parse_interface Format.err_formatter fn in
       lift # lift_Parsetree_signature ast
     else if Filename.check_suffix fn ".ml" then
-      let ast = Pparse.file Format.err_formatter fn Parse.implementation Config.ast_impl_magic_number in
+      let ast = Pparse.parse_implementation Format.err_formatter fn in
       lift # lift_Parsetree_structure ast
     else
       failwith (Printf.sprintf "Don't know what to do with file %s" fn)
@@ -105,15 +106,21 @@ let args =
 
    "-attrs_keep", Unit (fun () -> attrs := `Keep),
    "  Display real value of attribute fields";
+
+   "-pp", Arg.String (fun s -> Clflags.preprocessor := Some s),
+   "<command>  Pipe sources through preprocessor <command>";
+
+   "-ppx", Arg.String (fun s -> Compenv.first_ppx := s :: !Compenv.first_ppx),
+   "<command>  Pipe abstract syntax trees through preprocessor <command>";
   ]
+
 
 let usage =
   Printf.sprintf "%s [options] [.ml/.mli files]\n" Sys.argv.(0)
 
 let () =
+  Compenv.readenv Format.err_formatter Compenv.Before_args;
   try Arg.parse (Arg.align args) show_file usage
   with exn ->
     Errors.report_error Format.err_formatter exn;
     exit 2
-
-
