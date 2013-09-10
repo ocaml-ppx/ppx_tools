@@ -1,7 +1,14 @@
 ppx_tools
 =========
 
-Tools for authors of ppx rewriters and other syntactic tools.
+Tools for authors of syntactic tools (such as ppx rewriters).
+
+This package is licensed by LexiFi under the terms of the MIT license.
+
+The tools are installed as a findlib package called 'ppx_tools', and
+are thus accessible through the ocamlfind driver (e.g.: ocamlfind
+ppx_tools/dumpast.exe).
+
 
 dumpast.exe
 -----------
@@ -49,7 +56,7 @@ with basic types (int, string, char, int32, int64, nativeint) and data
 type builders (record, constr, tuple, list, array).  As an example,
 calling:
 
-    ./genlifter.exe -I +compiler-libs Location.t
+    ocamlfind ppx_tools/genlifter.exe -I +compiler-libs Location.t
 
 produces the following class:
 
