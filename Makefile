@@ -14,7 +14,7 @@ COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs
 
 .PHONY: all
 all: genlifter.exe dumpast.exe ppx_metaquot.exe ast_mapper_class.cmo ppx_tools.cma
-opt: ppx_tools.cmxa
+all: ppx_tools.cmxa
 
 genlifter.exe: genlifter.cmo
 	$(OCAMLC) $(COMPFLAGS) -o genlifter.exe ocamlcommon.cma genlifter.cmo
