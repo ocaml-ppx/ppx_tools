@@ -140,23 +140,24 @@ and tyexpr_fun env ty =
 
 let simplify =
   (* (fun x -> <expr> x) ====> <expr> *)
-  object
-    inherit Ast_mapper.mapper as super
-    method! expr e =
-      let e = super # expr e in
-      let open Longident in
-      let open Parsetree in
-      match e.pexp_desc with
-      | Pexp_fun
-          ("", None,
-           {ppat_desc = Ppat_var{txt=id;_};_},
-           {pexp_desc =
+  let open Ast_mapper in
+  let super = default_mapper in
+  let expr this e =
+    let e = super.expr this e in
+    let open Longident in
+    let open Parsetree in
+    match e.pexp_desc with
+    | Pexp_fun
+        ("", None,
+         {ppat_desc = Ppat_var{txt=id;_};_},
+         {pexp_desc =
             Pexp_apply
               (f,
                ["",{pexp_desc=
-                    Pexp_ident{txt=Lident id2;_};_}]);_}) when id = id2 -> f
-      | _ -> e
-  end
+                      Pexp_ident{txt=Lident id2;_};_}]);_}) when id = id2 -> f
+    | _ -> e
+  in
+  {super with expr}
 
 let args =
   let open Arg in
@@ -175,7 +176,7 @@ let main () =
   let params = [mknoloc "res", Invariant] in
   let cl = Ci.mk ~virt:Virtual ~params (mknoloc "lifter") (Cl.structure cl) in
   let s = [Str.class_ [cl]] in
-  Format.printf "%a@." Pprintast.structure (simplify # structure s)
+  Format.printf "%a@." Pprintast.structure (simplify.Ast_mapper.structure simplify s)
 
 let () =
   try main ()

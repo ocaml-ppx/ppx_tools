@@ -176,14 +176,14 @@ module Main : sig end = struct
     loc := old_loc;
     r
 
-  let expander = object
-    inherit Ast_mapper.mapper as super
-
-    method! expr e =
+  let expander _args =
+    let open Ast_mapper in
+    let super = default_mapper in
+    let expr this e =
       with_loc ~attrs:e.pexp_attributes
         (fun () ->
-          match e.pexp_desc with
-          | Pexp_extension({txt="expr";loc=l}, e) ->
+           match e.pexp_desc with
+           | Pexp_extension({txt="expr";loc=l}, e) ->
               (exp_lifter !loc) # lift_Parsetree_expression (get_exp l e)
           | Pexp_extension({txt="pat";loc=l}, e) ->
               (exp_lifter !loc) # lift_Parsetree_pattern (get_pat l e)
@@ -192,13 +192,12 @@ module Main : sig end = struct
           | Pexp_extension({txt="type";loc=l}, e) ->
               (exp_lifter !loc) # lift_Parsetree_core_type (get_typ l e)
           | _ ->
-              super # expr e
+              super.expr this e
         )
-
-    method! pat p =
+     and pat this p =
       with_loc ~attrs:p.ppat_attributes
         (fun () ->
-          match p.ppat_desc with
+           match p.ppat_desc with
           | Ppat_extension({txt="expr";loc=l}, e) ->
               pat_lifter # lift_Parsetree_expression (get_exp l e)
           | Ppat_extension({txt="pat";loc=l}, e) ->
@@ -208,20 +207,21 @@ module Main : sig end = struct
           | Ppat_extension({txt="type";loc=l}, e) ->
               pat_lifter # lift_Parsetree_core_type (get_typ l e)
           | _ ->
-              super # pat p
+              super.pat this p
         )
+     and structure this l =
+       with_loc
+         (fun () -> super.structure this l)
 
-    method! structure l =
-      with_loc
-        (fun () -> super # structure l)
+     and structure_item this x =
+       begin match x.pstr_desc with
+         | Pstr_attribute x -> handle_attr x
+         | _ -> ()
+       end;
+       super.structure_item this x
 
-    method! structure_item x =
-      begin match x.pstr_desc with
-      | Pstr_attribute x -> handle_attr x
-      | _ -> ()
-      end;
-      super # structure_item x
-  end
+    in
+    {super with expr; pat; structure; structure_item}
 
-  let () = Ast_mapper.main expander
+  let () = Ast_mapper.run_main expander
 end
