@@ -467,3 +467,44 @@ class mapper =
       | PTyp x -> PTyp (this # typ x)
       | PPat (x, g) -> PPat (this # pat x, map_opt (this # expr) g)
   end
+
+
+let to_mapper this =
+  let open Ast_mapper in
+  {
+    attribute = (fun _ -> this # attribute);
+    attributes = (fun _ -> this # attributes);
+    case = (fun _ -> this # case);
+    cases = (fun _ -> this # cases);
+    class_declaration = (fun _ -> this # class_declaration);
+    class_description = (fun _ -> this # class_description);
+    class_expr = (fun _ -> this # class_expr);
+    class_field = (fun _ -> this # class_field);
+    class_signature = (fun _ -> this # class_signature);
+    class_structure = (fun _ -> this # class_structure);
+    class_type = (fun _ -> this # class_type);
+    class_type_declaration = (fun _ -> this # class_type_declaration);
+    class_type_field = (fun _ -> this # class_type_field);
+    constructor_declaration = (fun _ -> this # constructor_declaration);
+    expr = (fun _ -> this # expr);
+    extension = (fun _ -> this # extension);
+    label_declaration = (fun _ -> this # label_declaration);
+    location = (fun _ -> this # location);
+    module_binding = (fun _ -> this # module_binding);
+    module_declaration = (fun _ -> this # module_declaration);
+    module_expr = (fun _ -> this # module_expr);
+    module_type = (fun _ -> this # module_type);
+    module_type_declaration = (fun _ -> this # module_type_declaration);
+    pat = (fun _ -> this # pat);
+    payload = (fun _ -> this # payload);
+    signature = (fun _ -> this # signature);
+    signature_item = (fun _ -> this # signature_item);
+    structure = (fun _ -> this # structure);
+    structure_item = (fun _ -> this # structure_item);
+    typ = (fun _ -> this # typ);
+    type_declaration = (fun _ -> this # type_declaration);
+    type_kind = (fun _ -> this # type_kind);
+    value_binding = (fun _ -> this # value_binding);
+    value_description = (fun _ -> this # value_description);
+    with_constraint = (fun _ -> this # with_constraint);
+  }

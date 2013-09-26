@@ -44,3 +44,7 @@ class mapper:
     method value_description: value_description -> value_description
     method with_constraint: with_constraint -> with_constraint
   end
+
+val to_mapper: mapper -> Ast_mapper.mapper
+  (** The resulting mapper is "closed", i.e. methods ignore
+      their first argument. *)
