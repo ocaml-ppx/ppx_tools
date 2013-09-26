@@ -1,2 +1,4 @@
 version = "0.1"
 description = "Tools for authors of ppx rewriters and other syntactic tools"
+archive(byte) = "ppx_tools.cma"
+archive(native) = "ppx_tools.cmxa"

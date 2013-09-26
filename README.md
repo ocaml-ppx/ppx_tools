@@ -5,9 +5,20 @@ Tools for authors of syntactic tools (such as ppx rewriters).
 
 This package is licensed by LexiFi under the terms of the MIT license.
 
-The tools are installed as a findlib package called 'ppx_tools', and
-are thus accessible through the ocamlfind driver (e.g.: ocamlfind
-ppx_tools/dumpast.exe).
+The tools are installed as a findlib package called 'ppx_tools'.
+Executables are thus accessible through the ocamlfind driver (e.g.:
+ocamlfind ppx_tools/dumpast.exe).
+
+
+Ast_mapper_class
+----------------
+
+This module implements an API similar to Ast_mapper from the
+compiler-libs, i.e. a generic mapper from Parsetree to Parsetree
+implemeting a deep identity copy, which can be customized with a
+custom behavior for each syntactic category.  The difference with
+Ast_mapper is that Ast_mapper_class implements the open recursion
+using a class.
 
 
 dumpast.exe
