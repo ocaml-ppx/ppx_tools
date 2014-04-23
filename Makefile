@@ -66,7 +66,11 @@ clean:
 
 # Install/uninstall
 
-INSTALL = META genlifter.exe dumpast.exe ppx_metaquot.exe ppx_tools.cma ppx_tools.cmxa ppx_tools$(EXT_LIB) ast_mapper_class.cmi ast_mapper_class.cmx
+INSTALL = META \
+   genlifter.exe dumpast.exe ppx_metaquot.exe \
+   ppx_tools.cma ppx_tools.cmxa ppx_tools$(EXT_LIB) \
+   ast_convenience.cmi ast_convenience.cmx \
+   ast_mapper_class.cmi ast_mapper_class.cmx
 
 .PHONY: install
 install:
