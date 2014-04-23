@@ -60,7 +60,7 @@ module Main : sig end = struct
   open Asttypes
   open Parsetree
   open Ast_helper
-  open Ast_helper.Convenience
+  open Ast_convenience
 
   let prefix ty s =
     let open Longident in

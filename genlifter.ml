@@ -13,7 +13,7 @@ open Location
 open Types
 open Asttypes
 open Ast_helper
-open Ast_helper.Convenience
+open Ast_convenience
 
 let selfcall ?(this = "this") m args = app (Exp.send (evar this) m) args
 
@@ -53,7 +53,7 @@ let rec gen ty =
   Hashtbl.add printed ty ();
   let params = List.mapi (fun i _ -> Printf.sprintf "f%i" i) td.type_params in
   let env = List.map2 (fun s t -> t.id, evar s) params td.type_params in
-  let tyargs = List.map Typ.var params in
+  let tyargs = List.map (fun t -> Typ.var t) params in
   let t = Typ.(arrow "" (constr (lid ty) tyargs) (var "res")) in
   let t =
     List.fold_right
@@ -63,16 +63,16 @@ let rec gen ty =
   in
   let t = Typ.poly params t in
   let concrete e =
-    let e = List.fold_right lam (List.map pvar params) e in
+    let e = List.fold_right (fun x e -> lam x e) (List.map pvar params) e in
     let body = Exp.poly e (Some t) in
     meths := Cf.(method_ (mknoloc (print_fun ty)) Public (concrete Fresh body)) :: !meths
   in
   match td.type_kind, td.type_manifest with
   | Type_record (l, _), _ ->
-      let field (s, _, t) =
-        let s = Ident.name s in
+      let field ld =
+        let s = Ident.name ld.ld_id in
         (lid (prefix ^ s), pvar s),
-        tuple[str s; tyexpr env t (evar s)]
+        tuple[str s; tyexpr env ld.ld_type (evar s)]
       in
       let l = List.map field l in
       concrete
@@ -80,10 +80,10 @@ let rec gen ty =
            (Pat.record (List.map fst l) Closed)
            (selfcall "record" [str ty; list (List.map snd l)]))
   | Type_variant l, _ ->
-      let case (c, tyl, _) =
-        let c = Ident.name c in
+      let case cd =
+        let c = Ident.name cd.cd_id in
         let qc = prefix ^ c in
-        let p, args = gentuple env tyl in
+        let p, args = gentuple env cd.cd_args in
         pconstr qc p, selfcall "constr" [str ty; tuple[str c; list args]]
       in
       concrete (func (List.map case l))

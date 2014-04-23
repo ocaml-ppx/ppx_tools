@@ -22,8 +22,11 @@ class mapper:
     method class_type_declaration: class_type_declaration -> class_type_declaration
     method class_type_field: class_type_field -> class_type_field
     method constructor_declaration: constructor_declaration -> constructor_declaration
+    method exception_rebind: exception_rebind -> exception_rebind
     method expr: expression -> expression
     method extension: extension -> extension
+    method include_declaration: include_declaration -> include_declaration
+    method include_description: include_description -> include_description
     method label_declaration: label_declaration -> label_declaration
     method location: Location.t -> Location.t
     method module_binding: module_binding -> module_binding
@@ -31,6 +34,7 @@ class mapper:
     method module_expr: module_expr -> module_expr
     method module_type: module_type -> module_type
     method module_type_declaration: module_type_declaration -> module_type_declaration
+    method open_description: open_description -> open_description
     method pat: pattern -> pattern
     method payload: payload -> payload
     method signature: signature -> signature

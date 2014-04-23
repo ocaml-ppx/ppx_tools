@@ -16,21 +16,21 @@ COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs
 all: genlifter.exe dumpast.exe ppx_metaquot.exe ast_mapper_class.cmo ppx_tools.cma
 all: ppx_tools.cmxa
 
-genlifter.exe: genlifter.cmo
-	$(OCAMLC) $(COMPFLAGS) -o genlifter.exe ocamlcommon.cma genlifter.cmo
+genlifter.exe: ppx_tools.cma genlifter.cmo
+	$(OCAMLC) $(COMPFLAGS) -o genlifter.exe ocamlcommon.cma ppx_tools.cma genlifter.cmo
 
 dumpast.exe: dumpast.cmo
 	$(OCAMLC) $(COMPFLAGS) -o dumpast.exe ocamlcommon.cma ocamlbytecomp.cma ast_lifter.cmo dumpast.cmo
 
 
 ppx_metaquot.exe: ppx_metaquot.cmo
-	$(OCAMLC) $(COMPFLAGS) -o ppx_metaquot.exe ocamlcommon.cma ast_lifter.cmo ppx_metaquot.cmo
+	$(OCAMLC) $(COMPFLAGS) -o ppx_metaquot.exe ocamlcommon.cma ppx_tools.cma ast_lifter.cmo ppx_metaquot.cmo
 
 ast_lifter.ml: genlifter.exe
 	./genlifter.exe -I +compiler-libs Parsetree.expression > ast_lifter.ml || rm -rf ast_lifter.ml
 
 
-OBJS = ast_mapper_class.cmo
+OBJS = ast_convenience.cmo ast_mapper_class.cmo
 
 ppx_tools.cma: $(OBJS)
 	$(OCAMLC) -a -o ppx_tools.cma $(OBJS)

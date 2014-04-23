@@ -113,10 +113,12 @@ module MT = struct
     let attrs = sub # attributes attrs in
     match desc with
     | Pmty_ident s -> ident ~loc ~attrs (map_loc sub s)
+    | Pmty_alias s -> alias ~loc ~attrs (map_loc sub s)
     | Pmty_signature sg -> signature ~loc ~attrs (sub # signature sg)
     | Pmty_functor (s, mt1, mt2) ->
-        functor_ ~loc ~attrs (map_loc sub s) (sub # module_type mt1)
-                 (sub # module_type mt2)
+        functor_ ~loc ~attrs (map_loc sub s)
+          (map_opt (sub # module_type) mt1)
+          (sub # module_type mt2)
     | Pmty_with (mt, l) ->
         with_ ~loc ~attrs (sub # module_type mt)
               (List.map (sub # with_constraint) l)
@@ -143,10 +145,8 @@ module MT = struct
     | Psig_recmodule l ->
         rec_module ~loc (List.map (sub # module_declaration) l)
     | Psig_modtype x -> modtype ~loc (sub # module_type_declaration x)
-    | Psig_open (ovf, lid, attrs) ->
-        open_ ~loc ~attrs:(sub # attributes attrs) ovf (map_loc sub lid)
-    | Psig_include (mt, attrs) ->
-        include_ ~loc (sub # module_type mt) ~attrs:(sub # attributes attrs)
+    | Psig_open od -> open_ ~loc (sub # open_description od)
+    | Psig_include x -> include_ ~loc (sub # include_description x)
     | Psig_class l -> class_ ~loc (List.map (sub # class_description) l)
     | Psig_class_type l ->
         class_type ~loc (List.map (sub # class_type_declaration) l)
@@ -167,8 +167,9 @@ module M = struct
     | Pmod_ident x -> ident ~loc ~attrs (map_loc sub x)
     | Pmod_structure str -> structure ~loc ~attrs (sub # structure str)
     | Pmod_functor (arg, arg_ty, body) ->
-        functor_ ~loc ~attrs (map_loc sub arg) (sub # module_type arg_ty)
-                 (sub # module_expr body)
+        functor_ ~loc ~attrs (map_loc sub arg)
+          (map_opt (sub # module_type) arg_ty)
+          (sub # module_expr body)
     | Pmod_apply (m1, m2) ->
         apply ~loc ~attrs (sub # module_expr m1) (sub # module_expr m2)
     | Pmod_constraint (m, mty) ->
@@ -186,19 +187,15 @@ module M = struct
     | Pstr_primitive vd -> primitive ~loc (sub # value_description vd)
     | Pstr_type l -> type_ ~loc (List.map (sub # type_declaration) l)
     | Pstr_exception ed -> exception_ ~loc (sub # constructor_declaration ed)
-    | Pstr_exn_rebind (s, lid, attrs) ->
-        exn_rebind ~loc (map_loc sub s) (map_loc sub lid)
-                   ~attrs:(sub # attributes attrs)
+    | Pstr_exn_rebind x -> exn_rebind ~loc (sub # exception_rebind x)
     | Pstr_module x -> module_ ~loc (sub # module_binding x)
     | Pstr_recmodule l -> rec_module ~loc (List.map (sub # module_binding) l)
     | Pstr_modtype x -> modtype ~loc (sub # module_type_declaration x)
-    | Pstr_open (ovf, lid, attrs) ->
-        open_ ~loc ~attrs:(sub # attributes attrs) ovf (map_loc sub lid)
+    | Pstr_open od -> open_ ~loc (sub # open_description od)
     | Pstr_class l -> class_ ~loc (List.map (sub # class_declaration) l)
     | Pstr_class_type l ->
         class_type ~loc (List.map (sub # class_type_declaration) l)
-    | Pstr_include (e, attrs) ->
-        include_ ~loc (sub # module_expr e) ~attrs:(sub # attributes attrs)
+    | Pstr_include x -> include_ ~loc (sub # include_declaration x)
     | Pstr_extension (x, attrs) ->
         extension ~loc (sub # extension x) ~attrs:(sub # attributes attrs)
     | Pstr_attribute x -> attribute ~loc (sub # attribute x)
@@ -242,9 +239,9 @@ module E = struct
     | Pexp_sequence (e1, e2) ->
         sequence ~loc ~attrs (sub # expr e1) (sub # expr e2)
     | Pexp_while (e1, e2) -> while_ ~loc ~attrs (sub # expr e1) (sub # expr e2)
-    | Pexp_for (id, e1, e2, d, e3) ->
-        for_ ~loc ~attrs (map_loc sub id) (sub # expr e1) (sub # expr e2) d
-             (sub # expr e3)
+    | Pexp_for (p, e1, e2, d, e3) ->
+        for_ ~loc ~attrs (sub # pat p) (sub # expr e1) (sub # expr e2) d
+          (sub # expr e3)
     | Pexp_coerce (e, t1, t2) ->
         coerce ~loc ~attrs (sub # expr e) (map_opt (sub # typ) t1)
                (sub # typ t2)
@@ -405,28 +402,31 @@ class mapper =
     method pat = P.map this
     method expr = E.map this
 
-    method module_declaration {pmd_name; pmd_type; pmd_attributes} =
+    method module_declaration {pmd_name; pmd_type; pmd_attributes; pmd_loc} =
       Md.mk
         (map_loc this pmd_name)
         (this # module_type pmd_type)
         ~attrs:(this # attributes pmd_attributes)
+        ~loc:(this # location pmd_loc)
 
-    method module_type_declaration {pmtd_name; pmtd_type; pmtd_attributes} =
-      {
-       pmtd_name = map_loc this pmtd_name;
-       pmtd_type = map_opt (this # module_type) pmtd_type;
-       pmtd_attributes = this # attributes pmtd_attributes;
-      }
+    method module_type_declaration {pmtd_name; pmtd_type; pmtd_attributes; pmtd_loc} =
+      Mtd.mk
+        (map_loc this pmtd_name)
+        ?typ:(map_opt (this # module_type) pmtd_type)
+        ~attrs:(this # attributes pmtd_attributes)
+        ~loc:(this # location pmtd_loc)
 
-    method module_binding {pmb_name; pmb_expr; pmb_attributes} =
+    method module_binding {pmb_name; pmb_expr; pmb_attributes; pmb_loc} =
       Mb.mk (map_loc this pmb_name) (this # module_expr pmb_expr)
         ~attrs:(this # attributes pmb_attributes)
+        ~loc:(this # location pmb_loc)
 
-    method value_binding {pvb_pat; pvb_expr; pvb_attributes} =
+    method value_binding {pvb_pat; pvb_expr; pvb_attributes; pvb_loc} =
       Vb.mk
         (this # pat pvb_pat)
         (this # expr pvb_expr)
         ~attrs:(this # attributes pvb_attributes)
+        ~loc:(this # location pvb_loc)
 
 
     method constructor_declaration {pcd_name; pcd_args; pcd_res; pcd_loc;
@@ -447,6 +447,15 @@ class mapper =
         ~loc:(this # location pld_loc)
         ~attrs:(this # attributes pld_attributes)
 
+
+    method exception_rebind
+        {pexrb_name; pexrb_lid; pexrb_attributes; pexrb_loc} =
+      Exrb.mk
+        (map_loc this pexrb_name)
+        (map_loc this pexrb_lid)
+        ~loc:(this # location pexrb_loc)
+        ~attrs:(this # attributes pexrb_attributes)
+
     method cases l = List.map (this # case) l
     method case {pc_lhs; pc_guard; pc_rhs} =
       {
@@ -455,7 +464,24 @@ class mapper =
        pc_rhs = this # expr pc_rhs;
     }
 
+    method open_description
+        {popen_lid; popen_override; popen_attributes; popen_loc} =
+      Opn.mk (map_loc this popen_lid)
+        ~override:popen_override
+        ~loc:(this # location popen_loc)
+        ~attrs:(this # attributes popen_attributes)
 
+    method include_description
+        {pincl_mod; pincl_attributes; pincl_loc} =
+      Incl.mk (this # module_type pincl_mod)
+        ~loc:(this # location pincl_loc)
+        ~attrs:(this # attributes pincl_attributes)
+
+    method include_declaration
+      {pincl_mod; pincl_attributes; pincl_loc} =
+      Incl.mk (this # module_expr pincl_mod)
+        ~loc:(this # location pincl_loc)
+        ~attrs:(this # attributes pincl_attributes)
 
     method location l = l
 
@@ -486,8 +512,11 @@ let to_mapper this =
     class_type_declaration = (fun _ -> this # class_type_declaration);
     class_type_field = (fun _ -> this # class_type_field);
     constructor_declaration = (fun _ -> this # constructor_declaration);
+    exception_rebind = (fun _ -> this # exception_rebind);
     expr = (fun _ -> this # expr);
     extension = (fun _ -> this # extension);
+    include_declaration = (fun _ -> this # include_declaration);
+    include_description = (fun _ -> this # include_description);
     label_declaration = (fun _ -> this # label_declaration);
     location = (fun _ -> this # location);
     module_binding = (fun _ -> this # module_binding);
@@ -495,6 +524,7 @@ let to_mapper this =
     module_expr = (fun _ -> this # module_expr);
     module_type = (fun _ -> this # module_type);
     module_type_declaration = (fun _ -> this # module_type_declaration);
+    open_description = (fun _ -> this # open_description);
     pat = (fun _ -> this # pat);
     payload = (fun _ -> this # payload);
     signature = (fun _ -> this # signature);
