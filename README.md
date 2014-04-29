@@ -21,8 +21,8 @@ Ast_mapper is that Ast_mapper_class implements the open recursion
 using a class.
 
 
-dumpast.exe
------------
+dumpast
+-------
 
 This tool parses fragments of OCaml code (or entire source files) and
 dump the resulting internal Parsetree representation.  Intended uses:
@@ -34,8 +34,8 @@ dump the resulting internal Parsetree representation.  Intended uses:
    code of syntax-manipulating programs (such as ppx rewriters).
 
 Usage:
- 
-  ocamlfind ppx_tools/dumpast.exe -e "1 + 2"
+
+    ocamlfind ppx_tools/dumpast -e "1 + 2"
 
 The tool can be used to show the Parsetree representation of small
 fragments of syntax passed on the command line (-e for expressions, -p
@@ -45,8 +45,8 @@ whole files.  The tool has further option to control how location and
 attribute fields in the Parsetree should be displayed.
 
 
-ppx_metaquot.exe
-----------------
+ppx_metaquot
+------------
 
 A ppx filter to help writing programs which manipulate the Parsetree,
 by allowing the programmer to use concrete syntax for expressions
@@ -56,12 +56,11 @@ supported extensions.
 
 Usage:
 
-  ocamlfind -c -ppx "ocamlfind ppx_tools/ppx_metaquot.exe" my_ppx_code.ml
+    ocamlfind -c -ppx "ocamlfind ppx_tools/ppx_metaquot" my_ppx_code.ml
 
 
-
-genlifter.exe
--------------
+genlifter
+---------
 
 This tool generates a virtual "lifter" class for one or several OCaml
 type constructors.  It does so by loading the .cmi files which define
@@ -73,7 +72,7 @@ with basic types (int, string, char, int32, int64, nativeint) and data
 type builders (record, constr, tuple, list, array).  As an example,
 calling:
 
-    ocamlfind ppx_tools/genlifter.exe -I +compiler-libs Location.t
+    ocamlfind ppx_tools/genlifter -I +compiler-libs Location.t
 
 produces the following class:
 
@@ -103,7 +102,7 @@ produces the following class:
               ("pos_bol", (this#int pos_bol));
               ("pos_cnum", (this#int pos_cnum))]
       end
-    
-dumpast.exe is a direct example of using genlifter.exe applied on the
+
+_dumpast_ is a direct example of using _genlifter_ applied on the
 OCaml Parsetree definition itself.  ppx_metaquot.exe is another
 similar example.
