@@ -11,6 +11,7 @@ open Ast_helper
 (** {2 Misc} *)
 
 val lid: string -> lid
+val with_loc: ('a -> 'b) -> 'a Location.loc -> 'b
 
 (** {2 Expressions} *)
 
