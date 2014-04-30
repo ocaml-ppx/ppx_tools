@@ -13,21 +13,21 @@ OCAMLOPT = ocamlopt
 COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
 
 .PHONY: all
-all: genlifter.exe dumpast.exe ppx_metaquot.exe ast_mapper_class.cmo ppx_tools.cma
+all: genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) ast_mapper_class.cmo ppx_tools.cma
 all: ppx_tools.cmxa
 
-genlifter.exe: ppx_tools.cma genlifter.cmo
-	$(OCAMLC) $(COMPFLAGS) -o genlifter.exe ocamlcommon.cma ppx_tools.cma genlifter.cmo
+genlifter$(EXE): ppx_tools.cma genlifter.cmo
+	$(OCAMLC) $(COMPFLAGS) -o genlifter$(EXE) ocamlcommon.cma ppx_tools.cma genlifter.cmo
 
-dumpast.exe: dumpast.cmo
-	$(OCAMLC) $(COMPFLAGS) -o dumpast.exe ocamlcommon.cma ocamlbytecomp.cma ast_lifter.cmo dumpast.cmo
+dumpast$(EXE): dumpast.cmo
+	$(OCAMLC) $(COMPFLAGS) -o dumpast$(EXE) ocamlcommon.cma ocamlbytecomp.cma ast_lifter.cmo dumpast.cmo
 
 
-ppx_metaquot.exe: ppx_metaquot.cmo
-	$(OCAMLC) $(COMPFLAGS) -o ppx_metaquot.exe ocamlcommon.cma ppx_tools.cma ast_lifter.cmo ppx_metaquot.cmo
+ppx_metaquot$(EXE): ppx_metaquot.cmo
+	$(OCAMLC) $(COMPFLAGS) -o ppx_metaquot$(EXE) ocamlcommon.cma ppx_tools.cma ast_lifter.cmo ppx_metaquot.cmo
 
-ast_lifter.ml: genlifter.exe
-	./genlifter.exe -I +compiler-libs Parsetree.expression > ast_lifter.ml || rm -rf ast_lifter.ml
+ast_lifter.ml: genlifter$(EXE)
+	./genlifter$(EXE) -I +compiler-libs Parsetree.expression > ast_lifter.ml || rm -rf ast_lifter.ml
 
 
 OBJS = ast_convenience.cmo ast_mapper_class.cmo
@@ -47,7 +47,8 @@ depend:
 
 .PHONY: clean
 clean:
-	rm -f *.cm* *.exe *~ *.o *.obj *.a *.lib *.tar.gz
+	rm -f *.cm* *~ *.o *.obj *.a *.lib *.tar.gz
+	rm -f genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE)
 	rm -f ast_lifter.ml
 
 # Default rules
@@ -67,7 +68,7 @@ clean:
 # Install/uninstall
 
 INSTALL = META \
-   genlifter.exe dumpast.exe ppx_metaquot.exe \
+   genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) \
    ppx_tools.cma ppx_tools.cmxa ppx_tools$(EXT_LIB) \
    ast_convenience.cmi ast_convenience.cmx \
    ast_mapper_class.cmi ast_mapper_class.cmx
