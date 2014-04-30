@@ -20,7 +20,8 @@ module T = struct
   (* Type expressions for the core language *)
 
   let row_field sub = function
-    | Rtag (l, b, tl) -> Rtag (l, b, List.map (sub # typ) tl)
+    | Rtag (l, attrs, b, tl) ->
+      Rtag (l, sub # attributes attrs, b, List.map (sub # typ) tl)
     | Rinherit t -> Rinherit (sub # typ t)
 
   let map sub {ptyp_desc = desc; ptyp_loc = loc; ptyp_attributes = attrs} =

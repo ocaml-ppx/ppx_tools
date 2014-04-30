@@ -10,7 +10,7 @@ VERSION = 0.1
 
 OCAMLC = ocamlc
 OCAMLOPT = ocamlopt
-COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs
+COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
 
 .PHONY: all
 all: genlifter.exe dumpast.exe ppx_metaquot.exe ast_mapper_class.cmo ppx_tools.cma

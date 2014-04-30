@@ -20,14 +20,14 @@ let selfcall ?(this = "this") m args = app (Exp.send (evar this) m) args
 (*************************************************************************)
 
 
-let env = Env.initial
+let env = Env.initial_safe_string
 
 let clean s =
-  let s = String.copy s in
-  for i = 0 to String.length s - 1 do
-    if s.[i] = '.' then s.[i] <- '_'
+  let s = Bytes.of_string s in
+  for i = 0 to Bytes.length s - 1 do
+    if Bytes.get s i = '.' then Bytes.set s i '_'
   done;
-  s
+  Bytes.to_string s
 
 let print_fun s = "lift_" ^ clean s
 
