@@ -22,9 +22,9 @@ class mapper:
     method class_type_declaration: class_type_declaration -> class_type_declaration
     method class_type_field: class_type_field -> class_type_field
     method constructor_declaration: constructor_declaration -> constructor_declaration
-    method exception_rebind: exception_rebind -> exception_rebind
     method expr: expression -> expression
     method extension: extension -> extension
+    method extension_constructor: extension_constructor -> extension_constructor
     method include_declaration: include_declaration -> include_declaration
     method include_description: include_description -> include_description
     method label_declaration: label_declaration -> label_declaration
@@ -43,6 +43,7 @@ class mapper:
     method structure_item: structure_item -> structure_item
     method typ: core_type -> core_type
     method type_declaration: type_declaration -> type_declaration
+    method type_extension: type_extension -> type_extension
     method type_kind: type_kind -> type_kind
     method value_binding: value_binding -> value_binding
     method value_description: value_description -> value_description

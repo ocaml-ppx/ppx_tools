@@ -92,6 +92,8 @@ let rec gen ty =
   | Type_abstract, None ->
       (* Generate an abstract method to lift abstract types *)
       meths := Cf.(method_ (mknoloc (print_fun ty)) Public (virtual_ t)) :: !meths
+  | Type_open, _ ->
+    failwith "Open types are not yet supported."
 
 and gentuple env tl =
   let arg i t =
@@ -173,7 +175,7 @@ let main () =
   Config.load_path := [Config.standard_library];
   Arg.parse (Arg.align args) gen usage;
   let cl = Cstr.mk (pvar "this") !meths in
-  let params = [mknoloc "res", Invariant] in
+  let params = [Typ.var "res", Invariant] in
   let cl = Ci.mk ~virt:Virtual ~params (mknoloc "lifter") (Cl.structure cl) in
   let s = [Str.class_ [cl]] in
   Format.printf "%a@." Pprintast.structure (simplify.Ast_mapper.structure simplify s)
