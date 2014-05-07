@@ -118,7 +118,8 @@ module Main : sig end = struct
           Location.print_error loc;
         exit 2
 
-  let exp_lifter loc =
+  let exp_lifter loc map =
+    let map = map.Ast_mapper.expr map in
     object
       inherit [_] Ast_lifter.lifter as super
       inherit exp_builder
@@ -128,19 +129,20 @@ module Main : sig end = struct
 
           (* Support for antiquotations *)
       method! lift_Parsetree_expression = function
-        | {pexp_desc=Pexp_extension({txt="e";loc}, e); _} -> get_exp loc e
+        | {pexp_desc=Pexp_extension({txt="e";loc}, e); _} -> map (get_exp loc e)
         | x -> super # lift_Parsetree_expression x
 
       method! lift_Parsetree_pattern = function
-        | {ppat_desc=Ppat_extension({txt="p";loc}, e); _} -> get_exp loc e
+        | {ppat_desc=Ppat_extension({txt="p";loc}, e); _} -> map (get_exp loc e)
         | x -> super # lift_Parsetree_pattern x
 
       method! lift_Parsetree_core_type = function
-        | {ptyp_desc=Ptyp_extension({txt="t";loc}, e); _} -> get_exp loc e
+        | {ptyp_desc=Ptyp_extension({txt="t";loc}, e); _} -> map (get_exp loc e)
         | x -> super # lift_Parsetree_core_type x
     end
 
-  let pat_lifter =
+  let pat_lifter map =
+    let map = map.Ast_mapper.pat map in
     object
       inherit [_] Ast_lifter.lifter as super
       inherit pat_builder
@@ -151,15 +153,15 @@ module Main : sig end = struct
 
           (* Support for antiquotations *)
       method! lift_Parsetree_expression = function
-        | {pexp_desc=Pexp_extension({txt="e";loc}, e); _} -> get_pat loc e
+        | {pexp_desc=Pexp_extension({txt="e";loc}, e); _} -> map (get_pat loc e)
         | x -> super # lift_Parsetree_expression x
 
       method! lift_Parsetree_pattern = function
-        | {ppat_desc=Ppat_extension({txt="p";loc}, e); _} -> get_pat loc e
+        | {ppat_desc=Ppat_extension({txt="p";loc}, e); _} -> map (get_pat loc e)
         | x -> super # lift_Parsetree_pattern x
 
       method! lift_Parsetree_core_type = function
-        | {ptyp_desc=Ptyp_extension({txt="t";loc}, e); _} -> get_pat loc e
+        | {ptyp_desc=Ptyp_extension({txt="t";loc}, e); _} -> map (get_pat loc e)
         | x -> super # lift_Parsetree_core_type x
     end
 
@@ -184,13 +186,13 @@ module Main : sig end = struct
         (fun () ->
            match e.pexp_desc with
            | Pexp_extension({txt="expr";loc=l}, e) ->
-              (exp_lifter !loc) # lift_Parsetree_expression (get_exp l e)
+              (exp_lifter !loc this) # lift_Parsetree_expression (get_exp l e)
           | Pexp_extension({txt="pat";loc=l}, e) ->
-              (exp_lifter !loc) # lift_Parsetree_pattern (get_pat l e)
+              (exp_lifter !loc this) # lift_Parsetree_pattern (get_pat l e)
           | Pexp_extension({txt="str";_}, PStr e) ->
-              (exp_lifter !loc) # lift_Parsetree_structure e
+              (exp_lifter !loc this) # lift_Parsetree_structure e
           | Pexp_extension({txt="type";loc=l}, e) ->
-              (exp_lifter !loc) # lift_Parsetree_core_type (get_typ l e)
+              (exp_lifter !loc this) # lift_Parsetree_core_type (get_typ l e)
           | _ ->
               super.expr this e
         )
@@ -199,13 +201,13 @@ module Main : sig end = struct
         (fun () ->
            match p.ppat_desc with
           | Ppat_extension({txt="expr";loc=l}, e) ->
-              pat_lifter # lift_Parsetree_expression (get_exp l e)
+              (pat_lifter this) # lift_Parsetree_expression (get_exp l e)
           | Ppat_extension({txt="pat";loc=l}, e) ->
-              pat_lifter # lift_Parsetree_pattern (get_pat l e)
+              (pat_lifter this) # lift_Parsetree_pattern (get_pat l e)
           | Ppat_extension({txt="str";_}, PStr e) ->
-              pat_lifter # lift_Parsetree_structure e
+              (pat_lifter this) # lift_Parsetree_structure e
           | Ppat_extension({txt="type";loc=l}, e) ->
-              pat_lifter # lift_Parsetree_core_type (get_typ l e)
+              (pat_lifter this) # lift_Parsetree_core_type (get_typ l e)
           | _ ->
               super.pat this p
         )
