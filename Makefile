@@ -14,7 +14,7 @@ COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
 
 .PHONY: all
 all: genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) ast_mapper_class.cmo ppx_tools.cma
-all: ppx_tools.cmxa
+all: ppx_tools.cmxa ppx_tools.cmxs
 
 genlifter$(EXE): ppx_tools.cma genlifter.cmo
 	$(OCAMLC) $(COMPFLAGS) -o genlifter$(EXE) ocamlcommon.cma ppx_tools.cma genlifter.cmo
@@ -36,6 +36,8 @@ ppx_tools.cma: $(OBJS)
 	$(OCAMLC) -a -o ppx_tools.cma $(OBJS)
 ppx_tools.cmxa: $(OBJS:.cmo=.cmx)
 	$(OCAMLOPT) -a -o ppx_tools.cmxa $(OBJS:.cmo=.cmx)
+ppx_tools.cmxs: $(OBJS:.cmo=.cmx)
+	$(OCAMLOPT) -shared -o ppx_tools.cmxs -linkall ppx_tools.cmxa
 
 
 .PHONY: depend
@@ -47,7 +49,7 @@ depend:
 
 .PHONY: clean
 clean:
-	rm -f *.cm* *~ *.o *.obj *.a *.lib *.tar.gz
+	rm -f *.cm* *~ *.o *.obj *.a *.lib *.tar.gz *.cmxs
 	rm -f genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE)
 	rm -f ast_lifter.ml
 
@@ -70,6 +72,7 @@ clean:
 INSTALL = META \
    genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) \
    ppx_tools.cma ppx_tools.cmxa ppx_tools$(EXT_LIB) \
+   ppx_tools.cmxs \
    ast_convenience.cmi ast_convenience.cmx \
    ast_mapper_class.cmi ast_mapper_class.cmx
 
