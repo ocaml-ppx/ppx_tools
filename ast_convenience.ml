@@ -12,6 +12,9 @@ let may_tuple tup = function
   | [x] -> Some x
   | l -> Some (tup ?loc:None ?attrs:None l)
 
+let with_loc f { txt ; loc } =
+  with_default_loc loc (fun () -> f txt)
+
 let lid s = mkloc (Longident.parse s) !default_loc
 let tuple l = Exp.tuple l
 let constr s args = Exp.construct (lid s) (may_tuple Exp.tuple args)
