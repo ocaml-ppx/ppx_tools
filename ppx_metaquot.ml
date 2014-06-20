@@ -191,6 +191,8 @@ module Main : sig end = struct
               (exp_lifter !loc this) # lift_Parsetree_pattern (get_pat l e)
           | Pexp_extension({txt="str";_}, PStr e) ->
               (exp_lifter !loc this) # lift_Parsetree_structure e
+          | Pexp_extension({txt="stri";_}, PStr [e]) ->
+              (exp_lifter !loc this) # lift_Parsetree_structure_item e
           | Pexp_extension({txt="type";loc=l}, e) ->
               (exp_lifter !loc this) # lift_Parsetree_core_type (get_typ l e)
           | _ ->
@@ -206,6 +208,8 @@ module Main : sig end = struct
               (pat_lifter this) # lift_Parsetree_pattern (get_pat l e)
           | Ppat_extension({txt="str";_}, PStr e) ->
               (pat_lifter this) # lift_Parsetree_structure e
+          | Ppat_extension({txt="stri";_}, PStr [e]) ->
+              (pat_lifter this) # lift_Parsetree_structure_item e
           | Ppat_extension({txt="type";loc=l}, e) ->
               (pat_lifter this) # lift_Parsetree_core_type (get_typ l e)
           | _ ->

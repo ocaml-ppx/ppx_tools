@@ -7,3 +7,8 @@
 *.cmx
 *.cmxs
 *.cmxa
+*.exe
+dumpast
+genlifter
+ppx_metaquot
+ast_lifter.ml
