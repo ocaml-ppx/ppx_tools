@@ -7,7 +7,7 @@ This package is licensed by LexiFi under the terms of the MIT license.
 
 The tools are installed as a findlib package called 'ppx_tools'.
 Executables are thus accessible through the ocamlfind driver (e.g.:
-ocamlfind ppx_tools/dumpast.exe).
+ocamlfind ppx_tools/dumpast).
 
 
 Ast_mapper_class
@@ -56,7 +56,7 @@ supported extensions.
 
 Usage:
 
-    ocamlfind -c -ppx "ocamlfind ppx_tools/ppx_metaquot" my_ppx_code.ml
+    ocamlfind -c -package ppx_tools.metaquot my_ppx_code.ml
 
 
 genlifter
@@ -104,5 +104,5 @@ produces the following class:
       end
 
 _dumpast_ is a direct example of using _genlifter_ applied on the
-OCaml Parsetree definition itself.  ppx_metaquot.exe is another
+OCaml Parsetree definition itself.  ppx_metaquot is another
 similar example.
