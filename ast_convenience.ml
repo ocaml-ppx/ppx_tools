@@ -27,7 +27,7 @@ let record ?over l =
   Exp.record (List.map (fun (s, e) -> (lid s, e)) l) over
 let func l = Exp.function_ (List.map (fun (p, e) -> Exp.case p e) l)
 let lam ?(label = "") ?default pat exp = Exp.fun_ label default pat exp
-let app f l = Exp.apply f (List.map (fun a -> "", a) l)
+let app f l = if l = [] then f else Exp.apply f (List.map (fun a -> "", a) l)
 let evar s = Exp.ident (lid s)
 let let_in ?(recursive = false) b body =
   Exp.let_ (if recursive then Recursive else Nonrecursive) b body
