@@ -10,6 +10,35 @@ Executables are thus accessible through the ocamlfind driver (e.g.:
 ocamlfind ppx_tools/dumpast).
 
 
+ppx_metaquot
+------------
+
+A ppx filter to help writing programs which manipulate the Parsetree,
+by allowing the programmer to use concrete syntax for expressions
+creating Parsetree fragments and patterns deconstructing Parsetree
+fragments.  See the top of ppx_metaquot.ml for a description of the
+supported extensions.
+
+Usage:
+
+    ocamlfind -c -package ppx_tools.metaquot my_ppx_code.ml
+
+
+rewriter
+--------
+
+An utility to help testing ppx rewriters that runs the rewriter on
+user-provided code and returns the result.
+
+Usage:
+
+    ocamlfind ppx_tools/rewriter ./my_ppx_rewriter sample.ml
+
+See the integrated help message for more details:
+
+    ocamlfind ppx_tools/rewriter -help
+
+
 Ast_mapper_class
 ----------------
 
@@ -43,20 +72,6 @@ for patterns, -t for type expressions) or for entire .ml/mli files.
 The standard -pp and -ppx options are supported, but only applied on
 whole files.  The tool has further option to control how location and
 attribute fields in the Parsetree should be displayed.
-
-
-ppx_metaquot
-------------
-
-A ppx filter to help writing programs which manipulate the Parsetree,
-by allowing the programmer to use concrete syntax for expressions
-creating Parsetree fragments and patterns deconstructing Parsetree
-fragments.  See the top of ppx_metaquot.ml for a description of the
-supported extensions.
-
-Usage:
-
-    ocamlfind -c -package ppx_tools.metaquot my_ppx_code.ml
 
 
 genlifter
