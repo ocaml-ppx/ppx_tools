@@ -85,18 +85,21 @@ let () =
     | "-"  -> Format.std_formatter
     | file -> Format.formatter_of_out_channel (wrap_open open_out file)
   in
-  !inputs |> List.iter (fun (ast_kind, source_kind, source) ->
-    let lexer = make_lexer source_kind source in
-    match ast_kind with
-    | `Struct ->
-      let pstr = Parse.implementation lexer in
-      let pstr = Pparse.apply_rewriters (* ~restore:true *) ~tool_name:!tool_name
-                                        Config.ast_impl_magic_number pstr in
-      Pprintast.structure fmt pstr;
-      Format.pp_print_newline fmt ()
-    | `Sig ->
-      let psig = Parse.interface lexer in
-      let psig = Pparse.apply_rewriters (* ~restore:true *) ~tool_name:!tool_name
-                                        Config.ast_intf_magic_number psig in
-      Pprintast.signature fmt psig;
-      Format.pp_print_newline fmt ())
+  try
+    !inputs |> List.iter (fun (ast_kind, source_kind, source) ->
+      let lexer = make_lexer source_kind source in
+      match ast_kind with
+      | `Struct ->
+        let pstr = Parse.implementation lexer in
+        let pstr = Pparse.apply_rewriters (* ~restore:true *) ~tool_name:!tool_name
+                                          Config.ast_impl_magic_number pstr in
+        Pprintast.structure fmt pstr;
+        Format.pp_print_newline fmt ()
+      | `Sig ->
+        let psig = Parse.interface lexer in
+        let psig = Pparse.apply_rewriters (* ~restore:true *) ~tool_name:!tool_name
+                                          Config.ast_intf_magic_number psig in
+        Pprintast.signature fmt psig;
+        Format.pp_print_newline fmt ())
+  with exn ->
+    Location.report_exception Format.err_formatter exn
