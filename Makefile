@@ -13,7 +13,7 @@ OCAMLOPT = ocamlopt
 COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
 
 .PHONY: all
-all: genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) ast_mapper_class.cmo ppx_tools.cma
+all: genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) ast_mapper_class.cmo ppx_tools.cma
 all: ppx_tools.cmxa ppx_tools.cmxs
 
 genlifter$(EXE): ppx_tools.cma genlifter.cmo
@@ -22,9 +22,11 @@ genlifter$(EXE): ppx_tools.cma genlifter.cmo
 dumpast$(EXE): dumpast.cmo
 	$(OCAMLC) $(COMPFLAGS) -o dumpast$(EXE) ocamlcommon.cma ocamlbytecomp.cma ast_lifter.cmo dumpast.cmo
 
-
 ppx_metaquot$(EXE): ppx_metaquot.cmo
 	$(OCAMLC) $(COMPFLAGS) -o ppx_metaquot$(EXE) ocamlcommon.cma ppx_tools.cma ast_lifter.cmo ppx_metaquot.cmo
+
+rewriter$(EXE): rewriter.cmo
+	$(OCAMLC) $(COMPFLAGS) -o rewriter$(EXE) ocamlcommon.cma rewriter.cmo
 
 ast_lifter.ml: genlifter$(EXE)
 	./genlifter$(EXE) -I +compiler-libs Parsetree.expression > ast_lifter.ml || rm -rf ast_lifter.ml
@@ -70,7 +72,7 @@ clean:
 # Install/uninstall
 
 INSTALL = META \
-   genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) \
+   genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) \
    ppx_tools.cma ppx_tools.cmxa ppx_tools$(EXT_LIB) \
    ppx_tools.cmxs \
    ast_convenience.cmi ast_convenience.cmx \
@@ -92,6 +94,7 @@ DISTRIB = \
   dumpast.ml \
   genlifter.ml \
   ppx_metaquot.ml \
+  rewriter.ml \
   ast_mapper_class.ml ast_mapper_class.mli
 
 FPACKAGE = $(PACKAGE)-$(VERSION)
