@@ -13,10 +13,10 @@ let may_tuple tup = function
   | l -> Some (tup ?loc:None ?attrs:None l)
 
 let lid s = mkloc (Longident.parse s) !default_loc
-let tuple l = Exp.tuple l
 let constr s args = Exp.construct (lid s) (may_tuple Exp.tuple args)
 let nil () = constr "[]" []
 let unit () = constr "()" []
+let tuple l = match l with [] -> unit () | [x] -> x | xs -> Exp.tuple xs
 let cons hd tl = constr "::" [hd; tl]
 let list l = List.fold_right cons l (nil ())
 let str s = Exp.constant (Const_string (s, None))
@@ -39,8 +39,8 @@ let precord ?(closed = Open) l =
 let pnil () = pconstr "[]" []
 let pcons hd tl = pconstr "::" [hd; tl]
 let punit () = pconstr "()" []
+let ptuple l = match l with [] -> punit () | [x] -> x | xs -> Pat.tuple xs
 let plist l = List.fold_right pcons l (pnil ())
-let ptuple l = Pat.tuple l
 
 let pstr s = Pat.constant (Const_string (s, None))
 let pint x = Pat.constant (Const_int x)
