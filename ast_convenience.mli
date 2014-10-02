@@ -36,6 +36,8 @@ val int: int -> expression
 val char: char -> expression
 val float: float -> expression
 
+val sequence: expression list -> last:expression -> expression
+
 (** {2 Patterns} *)
 
 val pvar: string -> pattern
@@ -58,6 +60,8 @@ val punit: unit -> pattern
 (** {2 Types} *)
 
 val tconstr: string -> core_type list -> core_type
+
+val arrows: (string * core_type) list -> return:core_type -> core_type
 
 (** {2 AST deconstruction} *)
 

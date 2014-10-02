@@ -31,6 +31,8 @@ let app f l = if l = [] then f else Exp.apply f (List.map (fun a -> "", a) l)
 let evar s = Exp.ident (lid s)
 let let_in ?(recursive = false) b body =
   Exp.let_ (if recursive then Recursive else Nonrecursive) b body
+let sequence l ~last =
+  List.fold_right Exp.sequence l last
 
 let pvar s = Pat.var (mkloc s !default_loc)
 let pconstr s args = Pat.construct (lid s) (may_tuple Pat.tuple args)
@@ -48,6 +50,11 @@ let pchar x = Pat.constant (Const_char x)
 let pfloat x = Pat.constant (Const_float (string_of_float x))
 
 let tconstr c l = Typ.constr (lid c) l
+let arrows args ~return =
+  List.fold_right (fun (l, ty) fun_ -> Typ.arrow l ty fun_)
+    args
+    return
+
 
 let get_str = function
   | {pexp_desc=Pexp_constant (Const_string (s, _)); _} -> Some s
