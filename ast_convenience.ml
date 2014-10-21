@@ -31,8 +31,10 @@ let app f l = if l = [] then f else Exp.apply f (List.map (fun a -> "", a) l)
 let evar s = Exp.ident (lid s)
 let let_in ?(recursive = false) b body =
   Exp.let_ (if recursive then Recursive else Nonrecursive) b body
-let sequence l ~last =
-  List.fold_right Exp.sequence l last
+
+let sequence = function
+  | [] -> unit ()
+  | h::xn -> List.fold_left (fun e x -> Exp.sequence e x) h xn
 
 let pvar s = Pat.var (mkloc s !default_loc)
 let pconstr s args = Pat.construct (lid s) (may_tuple Pat.tuple args)

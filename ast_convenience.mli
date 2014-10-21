@@ -36,7 +36,8 @@ val int: int -> expression
 val char: char -> expression
 val float: float -> expression
 
-val sequence: expression list -> last:expression -> expression
+(** Return [()] if the list is empty. Tail rec. *)
+val sequence: expression list -> expression
 
 (** {2 Patterns} *)
 
