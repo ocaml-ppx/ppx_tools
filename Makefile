@@ -8,9 +8,14 @@ PACKAGE = ppx_tools
 VERSION = 0.99
 # Don't forget to change META file as well
 
-OCAMLC = ocamlc
-OCAMLOPT = ocamlopt
-COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
+CPPO      = cppo
+OCAML     = ocaml
+OCAMLC    = ocamlc
+OCAMLOPT  = ocamlopt
+COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string \
+						-pp '$(CPPO) -V OCAML:$(OCAML_VERSION)'
+
+OCAML_VERSION := $(shell $(OCAML) -vnum)
 
 .PHONY: all
 all: genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) ast_mapper_class.cmo ppx_tools.cma
@@ -67,7 +72,6 @@ clean:
 
 .ml.cmx:
 	$(OCAMLOPT) $(COMPFLAGS) -c $<
-
 
 # Install/uninstall
 

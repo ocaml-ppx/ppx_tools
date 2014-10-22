@@ -5,5 +5,8 @@ build: [
   [make "install"]
 ]
 remove: [["ocamlfind" "remove" "ppx_tools"]]
-depends: ["ocamlfind" {>= "1.5.0"}]
+depends: [
+  "ocamlfind" {>= "1.5.0"}
+  "cppo"      {>= "1.1.2"}
+]
 ocaml-version: [>= "4.02.0"]
