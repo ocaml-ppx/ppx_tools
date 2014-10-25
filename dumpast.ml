@@ -57,10 +57,18 @@ let show_file fn =
   Compenv.readenv Format.err_formatter Compenv.Before_compile;
   let v =
     if Filename.check_suffix fn ".mli" then
+#if OCAML_VERSION >= (4, 02, 1)
       let ast = Pparse.parse_interface ~tool_name:"ocamlc" Format.err_formatter fn in
+#else
+      let ast = Pparse.parse_interface Format.err_formatter fn in
+#endif
       lift # lift_Parsetree_signature ast
     else if Filename.check_suffix fn ".ml" then
+#if OCAML_VERSION >= (4, 02, 1)
       let ast = Pparse.parse_implementation ~tool_name:"ocamlc" Format.err_formatter fn in
+#else
+      let ast = Pparse.parse_implementation Format.err_formatter fn in
+#endif
       lift # lift_Parsetree_structure ast
     else
       failwith (Printf.sprintf "Don't know what to do with file %s" fn)
