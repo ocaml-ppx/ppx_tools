@@ -32,6 +32,10 @@ let evar s = Exp.ident (lid s)
 let let_in ?(recursive = false) b body =
   Exp.let_ (if recursive then Recursive else Nonrecursive) b body
 
+let sequence = function
+  | [] -> unit ()
+  | hd :: tl -> List.fold_left (fun e1 e2 -> Exp.sequence e1 e2) hd tl
+
 let pvar s = Pat.var (mkloc s !default_loc)
 let pconstr s args = Pat.construct (lid s) (may_tuple Pat.tuple args)
 let precord ?(closed = Open) l =
