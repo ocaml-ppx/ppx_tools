@@ -88,7 +88,11 @@ module T = struct
 
   let map_extension_constructor_kind sub = function
       Pext_decl(ctl, cto) ->
+#if OCAML_VERSION >= (4, 03, 00)
+      Pext_decl(sub # constructor_arguments ctl, map_opt (sub # typ) cto)
+#else
       Pext_decl(List.map (sub # typ) ctl, map_opt (sub # typ) cto)
+#endif
     | Pext_rebind li ->
       Pext_rebind (map_loc sub li)
 
@@ -469,12 +473,21 @@ class mapper =
         ~attrs:(this # attributes pvb_attributes)
         ~loc:(this # location pvb_loc)
 
+#if OCAML_VERSION >= (4, 03, 00)
+    method constructor_arguments = function
+      | Pcstr_tuple (tys) -> Pcstr_tuple (List.map (this # typ) tys)
+      | Pcstr_record (ls) -> Pcstr_record (List.map (this # label_declaration) ls)
+#endif
 
     method constructor_declaration {pcd_name; pcd_args; pcd_res; pcd_loc;
                                     pcd_attributes} =
       Type.constructor
         (map_loc this pcd_name)
+#if OCAML_VERSION >= (4, 03, 00)
+        ~args:(this # constructor_arguments pcd_args)
+#else
         ~args:(List.map (this # typ) pcd_args)
+#endif
         ?res:(map_opt (this # typ) pcd_res)
         ~loc:(this # location pcd_loc)
         ~attrs:(this # attributes pcd_attributes)
