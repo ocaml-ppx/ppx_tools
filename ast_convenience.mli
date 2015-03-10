@@ -28,7 +28,7 @@ val list: expression list -> expression
 val unit: unit -> expression
 
 val func: (pattern * expression) list -> expression
-val lam: ?label:string -> ?default:expression -> pattern -> expression -> expression
+val lam: ?label:Asttypes.arg_label -> ?default:expression -> pattern -> expression -> expression
 val app: expression -> expression list -> expression
 
 val str: string -> expression
