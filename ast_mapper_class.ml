@@ -88,7 +88,7 @@ module T = struct
 
   let map_extension_constructor_kind sub = function
       Pext_decl(ctl, cto) ->
-      Pext_decl(sub # constructor_arguments ctl, map_opt (sub # typ) cto)
+      Pext_decl(List.map (sub # typ) ctl, map_opt (sub # typ) cto)
     | Pext_rebind li ->
       Pext_rebind (map_loc sub li)
 
@@ -290,9 +290,10 @@ module E = struct
     | Pexp_override sel ->
         override ~loc ~attrs
                  (List.map (map_tuple (map_loc sub) (sub # expr)) sel)
-    | Pexp_letmodule (s, me, e) ->
-        letmodule ~loc ~attrs (map_loc sub s) (sub # module_expr me)
-                  (sub # expr e)
+    (*
+     *| Pexp_letmodule (me, e) ->
+     *    letmodule ~loc ~attrs (sub # module_expr me) (sub # expr e)
+     *)
     | Pexp_assert e -> assert_ ~loc ~attrs (sub # expr e)
     | Pexp_lazy e -> lazy_ ~loc ~attrs (sub # expr e)
     | Pexp_poly (e, t) ->
@@ -303,6 +304,7 @@ module E = struct
     | Pexp_open (ovf, lid, e) ->
         open_ ~loc ~attrs ovf (map_loc sub lid) (sub # expr e)
     | Pexp_extension x -> extension ~loc ~attrs (sub # extension x)
+    | _ -> assert false
 end
 
 module P = struct
@@ -443,10 +445,11 @@ class mapper =
     method pat = P.map this
     method expr = E.map this
 
-    method module_declaration {pmd_name; pmd_type; pmd_attributes; pmd_loc} =
+    method module_declaration {pmd_name; pmd_type; pmd_attributes; pmd_loc; pmd_implicit} =
       Md.mk
         (map_loc this pmd_name)
         (this # module_type pmd_type)
+        ~implicit_:pmd_implicit
         ~attrs:(this # attributes pmd_attributes)
         ~loc:(this # location pmd_loc)
 
@@ -457,8 +460,9 @@ class mapper =
         ~attrs:(this # attributes pmtd_attributes)
         ~loc:(this # location pmtd_loc)
 
-    method module_binding {pmb_name; pmb_expr; pmb_attributes; pmb_loc} =
+    method module_binding {pmb_name; pmb_expr; pmb_attributes; pmb_loc; pmb_implicit} =
       Mb.mk (map_loc this pmb_name) (this # module_expr pmb_expr)
+        ~implicit_:pmb_implicit
         ~attrs:(this # attributes pmb_attributes)
         ~loc:(this # location pmb_loc)
 
@@ -469,15 +473,11 @@ class mapper =
         ~attrs:(this # attributes pvb_attributes)
         ~loc:(this # location pvb_loc)
 
-    method constructor_arguments = function
-      | Pcstr_tuple (tys) -> Pcstr_tuple (List.map (this # typ) tys)
-      | Pcstr_record (ls) -> Pcstr_record (List.map (this # label_declaration) ls)
-
     method constructor_declaration {pcd_name; pcd_args; pcd_res; pcd_loc;
                                     pcd_attributes} =
       Type.constructor
         (map_loc this pcd_name)
-        ~args:(this # constructor_arguments pcd_args)
+        ~args:(List.map (this # typ) pcd_args)
         ?res:(map_opt (this # typ) pcd_res)
         ~loc:(this # location pcd_loc)
         ~attrs:(this # attributes pcd_attributes)
@@ -501,10 +501,10 @@ class mapper =
     }
 
     method open_description
-        {popen_lid; popen_override; popen_attributes; popen_loc} =
+        {popen_lid; popen_flag; popen_attributes; popen_loc} =
       Opn.mk (map_loc this popen_lid)
-        ~override:popen_override
         ~loc:(this # location popen_loc)
+        ~flag:popen_flag
         ~attrs:(this # attributes popen_attributes)
 
     method include_description
