@@ -14,7 +14,13 @@ COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
 
 .PHONY: all
 all: genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) ast_mapper_class.cmo ppx_tools.cma
-all: ppx_tools.cmxa ppx_tools.cmxs
+
+ifneq ($(ARCH),none)
+all: ppx_tools.cmxa
+ifeq ($(NATDYNLINK),true)
+all: ppx_tools.cmxs
+endif
+endif
 
 genlifter$(EXE): ppx_tools.cma genlifter.cmo
 	$(OCAMLC) $(COMPFLAGS) -o genlifter$(EXE) ocamlcommon.cma ppx_tools.cma genlifter.cmo
@@ -73,10 +79,10 @@ clean:
 
 INSTALL = META \
    genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) \
-   ppx_tools.cma ppx_tools.cmxa ppx_tools$(EXT_LIB) \
-   ppx_tools.cmxs \
-   ast_convenience.cmi ast_convenience.cmx \
-   ast_mapper_class.cmi ast_mapper_class.cmx
+   ppx_tools.cma $(wildcard ppx_tools.cmxa ppx_tools$(EXT_LIB)) \
+   $(wildcard ppx_tools.cmxs) \
+   ast_convenience.cmi $(wildcard ast_convenience.cmx) \
+   ast_mapper_class.cmi $(wildcard ast_mapper_class.cmx)
 
 .PHONY: install
 install:
