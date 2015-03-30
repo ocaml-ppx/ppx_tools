@@ -174,7 +174,7 @@ module MT = struct
     let loc = sub # location loc in
     match desc with
     | Psig_value vd -> value ~loc (sub # value_description vd)
-    | Psig_type l -> type_ ~loc (List.map (sub # type_declaration) l)
+    | Psig_type (rf, l) -> type_ ~loc rf (List.map (sub # type_declaration) l)
     | Psig_typext te -> type_extension ~loc (sub # type_extension te)
     | Psig_exception ed -> exception_ ~loc (sub # extension_constructor ed)
     | Psig_module x -> module_ ~loc (sub # module_declaration x)
@@ -221,7 +221,7 @@ module M = struct
         eval ~loc ~attrs:(sub # attributes attrs) (sub # expr x)
     | Pstr_value (r, vbs) -> value ~loc r (List.map (sub # value_binding) vbs)
     | Pstr_primitive vd -> primitive ~loc (sub # value_description vd)
-    | Pstr_type l -> type_ ~loc (List.map (sub # type_declaration) l)
+    | Pstr_type (rf, l) -> type_ ~loc rf (List.map (sub # type_declaration) l)
     | Pstr_typext te -> type_extension ~loc (sub # type_extension te)
     | Pstr_exception ed -> exception_ ~loc (sub # extension_constructor ed)
     | Pstr_module x -> module_ ~loc (sub # module_binding x)
