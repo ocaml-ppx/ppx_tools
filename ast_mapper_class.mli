@@ -21,7 +21,6 @@ class mapper:
     method class_type: class_type -> class_type
     method class_type_declaration: class_type_declaration -> class_type_declaration
     method class_type_field: class_type_field -> class_type_field
-    method constructor_arguments: constructor_arguments -> constructor_arguments
     method constructor_declaration: constructor_declaration -> constructor_declaration
     method expr: expression -> expression
     method extension: extension -> extension

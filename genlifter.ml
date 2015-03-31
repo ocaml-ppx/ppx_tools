@@ -54,11 +54,11 @@ let rec gen ty =
   let params = List.mapi (fun i _ -> Printf.sprintf "f%i" i) td.type_params in
   let env = List.map2 (fun s t -> t.id, evar s) params td.type_params in
   let tyargs = List.map (fun t -> Typ.var t) params in
-  let t = Typ.(arrow Asttypes.Nolabel (constr (lid ty) tyargs) (var "res")) in
+  let t = Typ.(arrow Parsetree.Parr_simple (constr (lid ty) tyargs) (var "res")) in
   let t =
     List.fold_right
       (fun s t ->
-        Typ.(arrow Asttypes.Nolabel (arrow Asttypes.Nolabel (var s) (var "res")) t))
+        Typ.(arrow Parsetree.Parr_simple (arrow Parsetree.Parr_simple (var s) (var "res")) t))
       params t
   in
   let t = Typ.poly params t in
@@ -83,15 +83,9 @@ let rec gen ty =
       let case cd =
         let c = Ident.name cd.cd_id in
         let qc = prefix ^ c in
-        match cd.cd_args with
-        | Cstr_tuple (tys) ->
-          let p, args = gentuple env tys in
-          pconstr qc p, selfcall "constr" [str ty; tuple[str c; list args]]
-        | Cstr_record (l) ->
-          let l = List.map field l in
-          pconstr qc [Pat.record (List.map fst l) Closed],
-          selfcall "constr" [str ty; tuple [str c;
-            selfcall "record" [str (ty ^ "." ^ c); list (List.map snd l)]]]
+
+        let p, args = gentuple env cd.cd_args in
+        pconstr qc p, selfcall "constr" [str ty; tuple[str c; list args]]
       in
       concrete (func (List.map case l))
   | Type_abstract, Some t ->
@@ -157,12 +151,12 @@ let simplify =
     let open Parsetree in
     match e.pexp_desc with
     | Pexp_fun
-        (Asttypes.Nolabel, None,
+        (Parsetree.Parr_simple, None,
          {ppat_desc = Ppat_var{txt=id;_};_},
          {pexp_desc =
             Pexp_apply
               (f,
-               [Asttypes.Nolabel
+               [Parsetree.Papp_simple
                ,{pexp_desc= Pexp_ident{txt=Lident id2;_};_}]);_})
          when id = id2 -> f
     | _ -> e
