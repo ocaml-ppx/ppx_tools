@@ -33,6 +33,18 @@ let print_fun s = "lift_" ^ clean s
 
 let printed = Hashtbl.create 16
 let meths = ref []
+let use_existentials = ref false
+let use_arrows = ref false
+
+let existential_method =
+  Cf.(method_ (mknoloc "existential") Public
+        (virtual_ Typ.(poly ["a"] (arrow "" (var "a") (var "res"))))
+     )
+
+let arrow_method =
+  Cf.(method_ (mknoloc "arrow") Public
+        (virtual_ Typ.(poly ["a"] (arrow "" (var "a") (var "res"))))
+     )
 
 let rec gen ty =
   if Hashtbl.mem printed ty then ()
@@ -53,17 +65,20 @@ let rec gen ty =
   Hashtbl.add printed ty ();
   let params = List.mapi (fun i _ -> Printf.sprintf "f%i" i) td.type_params in
   let env = List.map2 (fun s t -> t.id, evar s) params td.type_params in
-  let tyargs = List.map (fun t -> Typ.var t) params in
-  let t = Typ.(arrow "" (constr (lid ty) tyargs) (var "res")) in
-  let t =
+  let make_result_t tyargs = Typ.(arrow "" (constr (lid ty) tyargs) (var "res")) in
+  let make_t tyargs =
     List.fold_right
-      (fun s t ->
-        Typ.(arrow "" (arrow "" (var s) (var "res")) t))
-      params t
+      (fun arg t ->
+         Typ.(arrow "" (arrow "" arg (var "res")) t))
+      tyargs (make_result_t tyargs)
   in
-  let t = Typ.poly params t in
+  let tyargs = List.map (fun t -> Typ.var t) params in
+  let t = Typ.poly params (make_t tyargs) in
   let concrete e =
     let e = List.fold_right (fun x e -> lam x e) (List.map pvar params) e in
+    let tyargs = List.map (fun t -> Typ.constr (lid t) []) params in
+    let e = Exp.constraint_ e (make_t tyargs) in
+    let e = List.fold_right (fun x e -> Exp.newtype x e) params e in
     let body = Exp.poly e (Some t) in
     meths := Cf.(method_ (mknoloc (print_fun ty)) Public (concrete Fresh body)) :: !meths
   in
@@ -105,11 +120,11 @@ and gentuple env tl =
 and tyexpr env ty x =
   match ty.desc with
   | Tvar _ ->
-      let f =
-        try List.assoc ty.id env
-        with Not_found -> assert false
-      in
-      app f [x]
+      (match List.assoc ty.id env with
+      | f -> app f [x]
+      | exception Not_found ->
+        use_existentials := true;
+        selfcall "existential" [x])
   | Ttuple tl ->
       let p, e = gentuple env tl in
       let_in [Vb.mk (Pat.tuple p) x] (selfcall "tuple" [list e])
@@ -133,6 +148,9 @@ and tyexpr env ty x =
       let ty = Path.name path in
       gen ty;
       selfcall (print_fun ty) (List.map (tyexpr_fun env) tl @ [x])
+  | Tarrow _ ->
+      use_arrows := true;
+      selfcall "arrow" [x]
   | _ ->
       Format.eprintf "** Cannot deal with type %a@." Printtyp.type_expr ty;
       exit 2
@@ -174,7 +192,20 @@ let usage =
 let main () =
   Config.load_path := [Config.standard_library];
   Arg.parse (Arg.align args) gen usage;
-  let cl = Cstr.mk (pvar "this") !meths in
+  let meths = !meths in
+  let meths =
+    if !use_existentials then
+      existential_method :: meths
+    else
+      meths
+  in
+  let meths =
+    if !use_arrows then
+      arrow_method :: meths
+    else
+      meths
+  in
+  let cl = Cstr.mk (pvar "this") meths in
   let params = [Typ.var "res", Invariant] in
   let cl = Ci.mk ~virt:Virtual ~params (mknoloc "lifter") (Cl.structure cl) in
   let s = [Str.class_ [cl]] in
