@@ -42,7 +42,7 @@ let lift =
       | `Discard, _ | `Discard_empty, [] -> Oval_ellipsis
       | `Underscore, _ -> Oval_stuff "_"
       | `Keep, _ | (`Discard_empty, _ :: _) ->
-        super # lift_Parsetree_attributes l
+          super # lift_Parsetree_attributes l
   end
 
 let show lifter parse s =
@@ -70,41 +70,41 @@ let show_file fn =
 let args =
   let open Arg in
   [
-   "-e", String show_expr,
-   "<expr> Dump AST for expression <expr>.";
+    "-e", String show_expr,
+    "<expr> Dump AST for expression <expr>.";
 
-   "-p", String show_pat,
-   "<pat> Dump AST for pattern <pat>.";
+    "-p", String show_pat,
+    "<pat> Dump AST for pattern <pat>.";
 
-   "-t", String show_typ,
-   "<pat> Dump AST for type expression <typ>.";
+    "-t", String show_typ,
+    "<pat> Dump AST for type expression <typ>.";
 
-   "-loc_discard", Unit (fun () -> locs := `Discard),
-   "  Discard location fields. (default)";
+    "-loc_discard", Unit (fun () -> locs := `Discard),
+    "  Discard location fields. (default)";
 
-   "-loc_underscore", Unit (fun () -> locs := `Underscore),
-   "  Display '_' for location fields";
+    "-loc_underscore", Unit (fun () -> locs := `Underscore),
+    "  Display '_' for location fields";
 
-   "-loc_keep", Unit (fun () -> locs := `Keep),
-   "  Display real value of location fields";
+    "-loc_keep", Unit (fun () -> locs := `Keep),
+    "  Display real value of location fields";
 
-   "-attrs_discard_empty", Unit (fun () -> attrs := `Discard_empty),
-   "  Discard empty attribute fields. (default)";
+    "-attrs_discard_empty", Unit (fun () -> attrs := `Discard_empty),
+    "  Discard empty attribute fields. (default)";
 
-   "-attrs_discard", Unit (fun () -> attrs := `Discard),
-   "  Discard all attribute fields.";
+    "-attrs_discard", Unit (fun () -> attrs := `Discard),
+    "  Discard all attribute fields.";
 
-   "-attrs_underscore", Unit (fun () -> attrs := `Underscore),
-   "  Display '_' for attribute fields";
+    "-attrs_underscore", Unit (fun () -> attrs := `Underscore),
+    "  Display '_' for attribute fields";
 
-   "-attrs_keep", Unit (fun () -> attrs := `Keep),
-   "  Display real value of attribute fields";
+    "-attrs_keep", Unit (fun () -> attrs := `Keep),
+    "  Display real value of attribute fields";
 
-   "-pp", Arg.String (fun s -> Clflags.preprocessor := Some s),
-   "<command>  Pipe sources through preprocessor <command>";
+    "-pp", Arg.String (fun s -> Clflags.preprocessor := Some s),
+    "<command>  Pipe sources through preprocessor <command>";
 
-   "-ppx", Arg.String (fun s -> Compenv.first_ppx := s :: !Compenv.first_ppx),
-   "<command>  Pipe abstract syntax trees through preprocessor <command>";
+    "-ppx", Arg.String (fun s -> Compenv.first_ppx := s :: !Compenv.first_ppx),
+    "<command>  Pipe abstract syntax trees through preprocessor <command>";
   ]
 
 
