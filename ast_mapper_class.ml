@@ -21,7 +21,7 @@ module T = struct
 
   let row_field sub = function
     | Rtag (l, attrs, b, tl) ->
-      Rtag (l, sub # attributes attrs, b, List.map (sub # typ) tl)
+        Rtag (l, sub # attributes attrs, b, List.map (sub # typ) tl)
     | Rinherit t -> Rinherit (sub # typ t)
 
   let map sub {ptyp_desc = desc; ptyp_loc = loc; ptyp_attributes = attrs} =
@@ -47,7 +47,7 @@ module T = struct
     | Ptyp_poly (sl, t) -> poly ~loc ~attrs sl (sub # typ t)
     | Ptyp_package (lid, l) ->
         package ~loc ~attrs (map_loc sub lid)
-                (List.map (map_tuple (map_loc sub) (sub # typ)) l)
+          (List.map (map_tuple (map_loc sub) (sub # typ)) l)
     | Ptyp_extension x -> extension ~loc ~attrs (sub # extension x)
 
   let map_type_declaration sub
@@ -61,7 +61,7 @@ module T = struct
       ~params:(List.map (map_fst (sub # typ)) ptype_params)
       ~priv:ptype_private
       ~cstrs:(List.map (map_tuple3 (sub # typ) (sub # typ) (sub # location))
-                       ptype_cstrs)
+                ptype_cstrs)
       ~kind:(sub # type_kind ptype_kind)
       ?manifest:(map_opt (sub # typ) ptype_manifest)
       ~loc:(sub # location ptype_loc)
@@ -88,9 +88,9 @@ module T = struct
 
   let map_extension_constructor_kind sub = function
       Pext_decl(ctl, cto) ->
-      Pext_decl(List.map (sub # typ) ctl, map_opt (sub # typ) cto)
+        Pext_decl(List.map (sub # typ) ctl, map_opt (sub # typ) cto)
     | Pext_rebind li ->
-      Pext_rebind (map_loc sub li)
+        Pext_rebind (map_loc sub li)
 
   let map_extension_constructor sub
       {pext_name;
@@ -121,7 +121,7 @@ module CT = struct
     | Pcty_extension x -> extension ~loc ~attrs (sub # extension x)
 
   let map_field sub {pctf_desc = desc; pctf_loc = loc; pctf_attributes = attrs}
-  =
+    =
     let open Ctf in
     let loc = sub # location loc in
     match desc with
@@ -156,7 +156,7 @@ module MT = struct
           (sub # module_type mt2)
     | Pmty_with (mt, l) ->
         with_ ~loc ~attrs (sub # module_type mt)
-              (List.map (sub # with_constraint) l)
+          (List.map (sub # with_constraint) l)
     | Pmty_typeof me -> typeof_ ~loc ~attrs (sub # module_expr me)
     | Pmty_extension x -> extension ~loc ~attrs (sub # extension x)
 
@@ -251,7 +251,7 @@ module E = struct
         let_ ~loc ~attrs r (List.map (sub # value_binding) vbs) (sub # expr e)
     | Pexp_fun (lab, def, p, e) ->
         fun_ ~loc ~attrs lab (map_opt (sub # expr) def) (sub # pat p)
-             (sub # expr e)
+          (sub # expr e)
     | Pexp_function pel -> function_ ~loc ~attrs (sub # cases pel)
     | Pexp_apply (e, l) ->
         apply ~loc ~attrs (sub # expr e) (List.map (map_snd (sub # expr)) l)
@@ -264,14 +264,14 @@ module E = struct
         variant ~loc ~attrs lab (map_opt (sub # expr) eo)
     | Pexp_record (l, eo) ->
         record ~loc ~attrs (List.map (map_tuple (map_loc sub) (sub # expr)) l)
-               (map_opt (sub # expr) eo)
+          (map_opt (sub # expr) eo)
     | Pexp_field (e, lid) -> field ~loc ~attrs (sub # expr e) (map_loc sub lid)
     | Pexp_setfield (e1, lid, e2) ->
         setfield ~loc ~attrs (sub # expr e1) (map_loc sub lid) (sub # expr e2)
     | Pexp_array el -> array ~loc ~attrs (List.map (sub # expr) el)
     | Pexp_ifthenelse (e1, e2, e3) ->
         ifthenelse ~loc ~attrs (sub # expr e1) (sub # expr e2)
-                   (map_opt (sub # expr) e3)
+          (map_opt (sub # expr) e3)
     | Pexp_sequence (e1, e2) ->
         sequence ~loc ~attrs (sub # expr e1) (sub # expr e2)
     | Pexp_while (e1, e2) -> while_ ~loc ~attrs (sub # expr e1) (sub # expr e2)
@@ -280,7 +280,7 @@ module E = struct
           (sub # expr e3)
     | Pexp_coerce (e, t1, t2) ->
         coerce ~loc ~attrs (sub # expr e) (map_opt (sub # typ) t1)
-               (sub # typ t2)
+          (sub # typ t2)
     | Pexp_constraint (e, t) ->
         constraint_ ~loc ~attrs (sub # expr e) (sub # typ t)
     | Pexp_send (e, s) -> send ~loc ~attrs (sub # expr e) s
@@ -289,10 +289,10 @@ module E = struct
         setinstvar ~loc ~attrs (map_loc sub s) (sub # expr e)
     | Pexp_override sel ->
         override ~loc ~attrs
-                 (List.map (map_tuple (map_loc sub) (sub # expr)) sel)
+          (List.map (map_tuple (map_loc sub) (sub # expr)) sel)
     | Pexp_letmodule (s, me, e) ->
         letmodule ~loc ~attrs (map_loc sub s) (sub # module_expr me)
-                  (sub # expr e)
+          (sub # expr e)
     | Pexp_assert e -> assert_ ~loc ~attrs (sub # expr e)
     | Pexp_lazy e -> lazy_ ~loc ~attrs (sub # expr e)
     | Pexp_poly (e, t) ->
@@ -324,7 +324,7 @@ module P = struct
     | Ppat_variant (l, p) -> variant ~loc ~attrs l (map_opt (sub # pat) p)
     | Ppat_record (lpl, cf) ->
         record ~loc ~attrs (List.map (map_tuple (map_loc sub) (sub # pat)) lpl)
-               cf
+          cf
     | Ppat_array pl -> array ~loc ~attrs (List.map (sub # pat) pl)
     | Ppat_or (p1, p2) -> or_ ~loc ~attrs (sub # pat p1) (sub # pat p2)
     | Ppat_constraint (p, t) ->
@@ -354,10 +354,10 @@ module CE = struct
           (sub # class_expr ce)
     | Pcl_apply (ce, l) ->
         apply ~loc ~attrs (sub # class_expr ce)
-              (List.map (map_snd (sub # expr)) l)
+          (List.map (map_snd (sub # expr)) l)
     | Pcl_let (r, vbs, ce) ->
         let_ ~loc ~attrs r (List.map (sub # value_binding) vbs)
-             (sub # class_expr ce)
+          (sub # class_expr ce)
     | Pcl_constraint (ce, ct) ->
         constraint_ ~loc ~attrs (sub # class_expr ce) (sub # class_type ct)
     | Pcl_extension x -> extension ~loc ~attrs (sub # extension x)
@@ -382,15 +382,15 @@ module CE = struct
 
   let map_structure sub {pcstr_self; pcstr_fields} =
     {
-     pcstr_self = sub # pat pcstr_self;
-     pcstr_fields = List.map (sub # class_field) pcstr_fields;
+      pcstr_self = sub # pat pcstr_self;
+      pcstr_fields = List.map (sub # class_field) pcstr_fields;
     }
 
   let class_infos sub f {pci_virt; pci_params = pl; pci_name; pci_expr;
                          pci_loc; pci_attributes} =
     Ci.mk
-     ~virt:pci_virt
-     ~params:(List.map (map_fst (sub # typ)) pl)
+      ~virt:pci_virt
+      ~params:(List.map (map_fst (sub # typ)) pl)
       (map_loc sub pci_name)
       (f pci_expr)
       ~loc:(sub # location pci_loc)
@@ -492,10 +492,10 @@ class mapper =
     method cases l = List.map (this # case) l
     method case {pc_lhs; pc_guard; pc_rhs} =
       {
-       pc_lhs = this # pat pc_lhs;
-       pc_guard = map_opt (this # expr) pc_guard;
-       pc_rhs = this # expr pc_rhs;
-    }
+        pc_lhs = this # pat pc_lhs;
+        pc_guard = map_opt (this # expr) pc_guard;
+        pc_rhs = this # expr pc_rhs;
+      }
 
     method open_description
         {popen_lid; popen_override; popen_attributes; popen_loc} =
@@ -511,7 +511,7 @@ class mapper =
         ~attrs:(this # attributes pincl_attributes)
 
     method include_declaration
-      {pincl_mod; pincl_attributes; pincl_loc} =
+        {pincl_mod; pincl_attributes; pincl_loc} =
       Incl.mk (this # module_expr pincl_mod)
         ~loc:(this # location pincl_loc)
         ~attrs:(this # attributes pincl_attributes)

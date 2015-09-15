@@ -125,10 +125,10 @@ module Main : sig end = struct
       inherit [_] Ast_lifter.lifter as super
       inherit exp_builder
 
-          (* Special support for location in the generated AST *)
+      (* Special support for location in the generated AST *)
       method! lift_Location_t _ = loc
 
-          (* Support for antiquotations *)
+      (* Support for antiquotations *)
       method! lift_Parsetree_expression = function
         | {pexp_desc=Pexp_extension({txt="e";loc}, e); _} -> map (get_exp loc e)
         | x -> super # lift_Parsetree_expression x
@@ -148,11 +148,11 @@ module Main : sig end = struct
       inherit [_] Ast_lifter.lifter as super
       inherit pat_builder
 
-          (* Special support for location and attributes in the generated AST *)
+      (* Special support for location and attributes in the generated AST *)
       method! lift_Location_t _ = Pat.any ()
       method! lift_Parsetree_attributes _ = Pat.any ()
 
-          (* Support for antiquotations *)
+      (* Support for antiquotations *)
       method! lift_Parsetree_expression = function
         | {pexp_desc=Pexp_extension({txt="e";loc}, e); _} -> map (get_pat loc e)
         | x -> super # lift_Parsetree_expression x
@@ -187,45 +187,45 @@ module Main : sig end = struct
         (fun () ->
            match e.pexp_desc with
            | Pexp_extension({txt="expr";loc=l}, e) ->
-              (exp_lifter !loc this) # lift_Parsetree_expression (get_exp l e)
-          | Pexp_extension({txt="pat";loc=l}, e) ->
-              (exp_lifter !loc this) # lift_Parsetree_pattern (get_pat l e)
-          | Pexp_extension({txt="str";_}, PStr e) ->
-              (exp_lifter !loc this) # lift_Parsetree_structure e
-          | Pexp_extension({txt="stri";_}, PStr [e]) ->
-              (exp_lifter !loc this) # lift_Parsetree_structure_item e
-          | Pexp_extension({txt="type";loc=l}, e) ->
-              (exp_lifter !loc this) # lift_Parsetree_core_type (get_typ l e)
-          | _ ->
-              super.expr this e
+               (exp_lifter !loc this) # lift_Parsetree_expression (get_exp l e)
+           | Pexp_extension({txt="pat";loc=l}, e) ->
+               (exp_lifter !loc this) # lift_Parsetree_pattern (get_pat l e)
+           | Pexp_extension({txt="str";_}, PStr e) ->
+               (exp_lifter !loc this) # lift_Parsetree_structure e
+           | Pexp_extension({txt="stri";_}, PStr [e]) ->
+               (exp_lifter !loc this) # lift_Parsetree_structure_item e
+           | Pexp_extension({txt="type";loc=l}, e) ->
+               (exp_lifter !loc this) # lift_Parsetree_core_type (get_typ l e)
+           | _ ->
+               super.expr this e
         )
-     and pat this p =
+    and pat this p =
       with_loc ~attrs:p.ppat_attributes
         (fun () ->
            match p.ppat_desc with
-          | Ppat_extension({txt="expr";loc=l}, e) ->
-              (pat_lifter this) # lift_Parsetree_expression (get_exp l e)
-          | Ppat_extension({txt="pat";loc=l}, e) ->
-              (pat_lifter this) # lift_Parsetree_pattern (get_pat l e)
-          | Ppat_extension({txt="str";_}, PStr e) ->
-              (pat_lifter this) # lift_Parsetree_structure e
-          | Ppat_extension({txt="stri";_}, PStr [e]) ->
-              (pat_lifter this) # lift_Parsetree_structure_item e
-          | Ppat_extension({txt="type";loc=l}, e) ->
-              (pat_lifter this) # lift_Parsetree_core_type (get_typ l e)
-          | _ ->
-              super.pat this p
+           | Ppat_extension({txt="expr";loc=l}, e) ->
+               (pat_lifter this) # lift_Parsetree_expression (get_exp l e)
+           | Ppat_extension({txt="pat";loc=l}, e) ->
+               (pat_lifter this) # lift_Parsetree_pattern (get_pat l e)
+           | Ppat_extension({txt="str";_}, PStr e) ->
+               (pat_lifter this) # lift_Parsetree_structure e
+           | Ppat_extension({txt="stri";_}, PStr [e]) ->
+               (pat_lifter this) # lift_Parsetree_structure_item e
+           | Ppat_extension({txt="type";loc=l}, e) ->
+               (pat_lifter this) # lift_Parsetree_core_type (get_typ l e)
+           | _ ->
+               super.pat this p
         )
-     and structure this l =
-       with_loc
-         (fun () -> super.structure this l)
+    and structure this l =
+      with_loc
+        (fun () -> super.structure this l)
 
-     and structure_item this x =
-       begin match x.pstr_desc with
-         | Pstr_attribute x -> handle_attr x
-         | _ -> ()
-       end;
-       super.structure_item this x
+    and structure_item this x =
+      begin match x.pstr_desc with
+      | Pstr_attribute x -> handle_attr x
+      | _ -> ()
+      end;
+      super.structure_item this x
 
     in
     {super with expr; pat; structure; structure_item}

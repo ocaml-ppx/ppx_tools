@@ -51,5 +51,5 @@ class mapper:
   end
 
 val to_mapper: #mapper -> Ast_mapper.mapper
-  (** The resulting mapper is "closed", i.e. methods ignore
-      their first argument. *)
+(** The resulting mapper is "closed", i.e. methods ignore
+    their first argument. *)

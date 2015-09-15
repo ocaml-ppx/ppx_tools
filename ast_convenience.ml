@@ -59,7 +59,7 @@ let get_str = function
 
 let get_lid = function
   | {pexp_desc=Pexp_ident{txt=id;_};_} ->
-    Some (String.concat "." (Longident.flatten id))
+      Some (String.concat "." (Longident.flatten id))
   | _ -> None
 
 let find_attr s attrs =
