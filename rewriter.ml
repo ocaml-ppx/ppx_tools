@@ -102,4 +102,5 @@ let () =
         Pprintast.signature fmt psig;
         Format.pp_print_newline fmt ())
   with exn ->
-    Location.report_exception Format.err_formatter exn
+    Location.report_exception Format.err_formatter exn;
+    exit 2
