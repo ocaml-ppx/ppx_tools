@@ -5,8 +5,6 @@
 (* A -ppx rewriter to be used to write Parsetree-generating code
    (including other -ppx rewriters) using concrete syntax.
 
-   See metaquot_test.ml for an example.
-
    We support the following extensions in expression position:
 
    [%expr ...]  maps to code which creates the expression represented by ...
