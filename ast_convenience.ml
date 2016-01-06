@@ -19,10 +19,10 @@ let unit () = constr "()" []
 let tuple l = match l with [] -> unit () | [x] -> x | xs -> Exp.tuple xs
 let cons hd tl = constr "::" [hd; tl]
 let list l = List.fold_right cons l (nil ())
-let str s = Exp.constant (Const_string (s, None))
-let int x = Exp.constant (Const_int x)
-let char x = Exp.constant (Const_char x)
-let float x = Exp.constant (Const_float (string_of_float x))
+let str s = Exp.constant (PConst_string (s, None))
+let int x = Exp.constant (PConst_int (string_of_int x, None))
+let char x = Exp.constant (PConst_char x)
+let float x = Exp.constant (PConst_float (string_of_float x, None))
 let record ?over l =
   Exp.record (List.map (fun (s, e) -> (lid s, e)) l) over
 let func l = Exp.function_ (List.map (fun (p, e) -> Exp.case p e) l)
@@ -46,15 +46,15 @@ let punit () = pconstr "()" []
 let ptuple l = match l with [] -> punit () | [x] -> x | xs -> Pat.tuple xs
 let plist l = List.fold_right pcons l (pnil ())
 
-let pstr s = Pat.constant (Const_string (s, None))
-let pint x = Pat.constant (Const_int x)
-let pchar x = Pat.constant (Const_char x)
-let pfloat x = Pat.constant (Const_float (string_of_float x))
+let pstr s = Pat.constant (PConst_string (s, None))
+let pint x = Pat.constant (PConst_int (string_of_int x, None))
+let pchar x = Pat.constant (PConst_char x)
+let pfloat x = Pat.constant (PConst_float (string_of_float x, None))
 
 let tconstr c l = Typ.constr (lid c) l
 
 let get_str = function
-  | {pexp_desc=Pexp_constant (Const_string (s, _)); _} -> Some s
+  | {pexp_desc=Pexp_constant (PConst_string (s, _)); _} -> Some s
   | _ -> None
 
 let get_lid = function
