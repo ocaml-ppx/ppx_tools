@@ -303,6 +303,7 @@ module E = struct
     | Pexp_open (ovf, lid, e) ->
         open_ ~loc ~attrs ovf (map_loc sub lid) (sub # expr e)
     | Pexp_extension x -> extension ~loc ~attrs (sub # extension x)
+    | Pexp_unreachable -> unreachable ~loc ~attrs ()
 end
 
 module P = struct
@@ -528,6 +529,7 @@ class mapper =
       | PStr x -> PStr (this # structure x)
       | PTyp x -> PTyp (this # typ x)
       | PPat (x, g) -> PPat (this # pat x, map_opt (this # expr) g)
+      | PSig x -> PSig (this # signature x)
   end
 
 
