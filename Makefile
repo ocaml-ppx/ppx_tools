@@ -5,7 +5,7 @@
 include $(shell ocamlc -where)/Makefile.config
 
 PACKAGE = ppx_tools
-VERSION = 0.99
+VERSION = 0.99.3
 # Don't forget to change META file as well
 
 OCAMLC = ocamlc
@@ -118,5 +118,3 @@ package: clean
 TARGET=foo:bar/ppx_tools_data
 upload:
 	scp $(FPACKAGE).tar.gz $(TARGET)/
-
-
