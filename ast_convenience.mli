@@ -8,6 +8,24 @@ open Parsetree
 open Asttypes
 open Ast_helper
 
+(** {2 Compatibility modules} *)
+
+module Label : sig
+  type t = Asttypes.arg_label
+
+  type desc = Asttypes.arg_label =
+      Nolabel
+    | Labelled of string
+    | Optional of string
+
+  val explode : t -> desc
+
+  val nolabel : t
+  val labelled : string -> t
+  val optional : string -> t
+
+end
+
 (** {2 Misc} *)
 
 val lid: string -> lid
@@ -28,7 +46,7 @@ val list: expression list -> expression
 val unit: unit -> expression
 
 val func: (pattern * expression) list -> expression
-val lam: ?label:Asttypes.arg_label -> ?default:expression -> pattern -> expression -> expression
+val lam: ?label:Label.t -> ?default:expression -> pattern -> expression -> expression
 val app: expression -> expression list -> expression
 
 val str: string -> expression

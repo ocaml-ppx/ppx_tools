@@ -7,6 +7,25 @@ open Asttypes
 open Location
 open Ast_helper
 
+
+module Label = struct
+
+  type t = Asttypes.arg_label
+
+  type desc = Asttypes.arg_label =
+      Nolabel
+    | Labelled of string
+    | Optional of string
+
+  let explode x = x
+
+  let nolabel = Nolabel
+  let labelled x = Labelled x
+  let optional x = Optional x
+
+end
+
+
 let may_tuple tup = function
   | [] -> None
   | [x] -> Some x
@@ -26,8 +45,8 @@ let float x = Exp.constant (PConst_float (string_of_float x, None))
 let record ?over l =
   Exp.record (List.map (fun (s, e) -> (lid s, e)) l) over
 let func l = Exp.function_ (List.map (fun (p, e) -> Exp.case p e) l)
-let lam ?(label = Asttypes.Nolabel) ?default pat exp = Exp.fun_ label default pat exp
-let app f l = if l = [] then f else Exp.apply f (List.map (fun a -> Asttypes.Nolabel, a) l)
+let lam ?(label = Label.nolabel) ?default pat exp = Exp.fun_ label default pat exp
+let app f l = if l = [] then f else Exp.apply f (List.map (fun a -> Label.nolabel, a) l)
 let evar s = Exp.ident (lid s)
 let let_in ?(recursive = false) b body =
   Exp.let_ (if recursive then Recursive else Nonrecursive) b body
