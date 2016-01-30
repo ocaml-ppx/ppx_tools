@@ -54,7 +54,7 @@ let show_pat = show (lift # lift_Parsetree_pattern) Parse.pattern
 let show_typ = show (lift # lift_Parsetree_core_type) Parse.core_type
 
 let show_file fn =
-  Compenv.readenv Format.err_formatter Compenv.Before_compile;
+  Compenv.readenv Format.err_formatter (Compenv.Before_compile fn);
   let v =
     if Filename.check_suffix fn ".mli" then
       let ast = Pparse.parse_interface ~tool_name:"ocamlc" Format.err_formatter fn in

@@ -76,9 +76,9 @@ module Main : sig end = struct
       method int = int
       method string = str
       method char = char
-      method int32 x = Exp.constant (PConst_int (Int32.to_string x, Some 'l'))
-      method int64 x = Exp.constant (PConst_int (Int64.to_string x, Some 'L'))
-      method nativeint x = Exp.constant (PConst_int (Nativeint.to_string x, Some 'n'))
+      method int32 x = Exp.constant (Const.int32 x)
+      method int64 x = Exp.constant (Const.int64 x)
+      method nativeint x = Exp.constant (Const.nativeint x)
     end
 
   class pat_builder =
@@ -90,9 +90,9 @@ module Main : sig end = struct
       method int = pint
       method string = pstr
       method char = pchar
-      method int32 x = Pat.constant (PConst_int (Int32.to_string x, Some 'l'))
-      method int64 x = Pat.constant (PConst_int (Int64.to_string x, Some 'L'))
-      method nativeint x = Pat.constant (PConst_int (Nativeint.to_string x, Some 'n'))
+      method int32 x = Pat.constant (Const.int32 x)
+      method int64 x = Pat.constant (Const.int64 x)
+      method nativeint x = Pat.constant (Const.nativeint x)
     end
 
 
