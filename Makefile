@@ -8,7 +8,7 @@ PACKAGE = ppx_tools
 VERSION = 0.99.3
 # Don't forget to change META file as well
 
-OCAMLC = ocamlc
+OCAMLC = ocamlc -bin-annot
 OCAMLOPT = ocamlopt
 COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
 
@@ -57,7 +57,7 @@ depend:
 
 .PHONY: clean
 clean:
-	rm -f *.cm* *~ *.o *.obj *.a *.lib *.tar.gz *.cmxs
+	rm -f *.cm* *~ *.o *.obj *.a *.lib *.tar.gz *.cmxs *.cmt *.cmti
 	rm -f genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE)
 	rm -f ast_lifter.ml
 
@@ -76,13 +76,13 @@ clean:
 
 
 # Install/uninstall
-
+targets = $(1).mli $(1).cmi $(1).cmt $(1).cmti $(wildcard $(1).cmx)
 INSTALL = META \
    genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) \
    ppx_tools.cma $(wildcard ppx_tools.cmxa ppx_tools$(EXT_LIB)) \
    $(wildcard ppx_tools.cmxs) \
-   ast_convenience.cmi $(wildcard ast_convenience.cmx) \
-   ast_mapper_class.cmi $(wildcard ast_mapper_class.cmx)
+   $(call targets,ast_convenience) \
+   $(call targets,ast_mapper_class)
 
 .PHONY: install
 install:
