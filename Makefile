@@ -5,7 +5,7 @@
 include $(shell ocamlc -where)/Makefile.config
 
 PACKAGE = ppx_tools
-VERSION = 0.99.3
+VERSION = 4.02.3
 # Don't forget to change META file as well
 
 OCAMLC = ocamlc -bin-annot
