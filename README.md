@@ -9,6 +9,11 @@ The tools are installed as a findlib package called 'ppx_tools'.
 Executables are thus accessible through the ocamlfind driver (e.g.:
 ocamlfind ppx_tools/dumpast).
 
+Main contributors:
+
+  - Alain Frisch
+  - Peter Zotov (whitequark)
+  - Gabriel Radanne (Drup)   
 
 ppx_metaquot
 ------------
