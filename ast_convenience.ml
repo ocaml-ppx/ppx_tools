@@ -76,6 +76,10 @@ let get_str = function
   | {pexp_desc=Pexp_constant (Pconst_string (s, _)); _} -> Some s
   | _ -> None
 
+let get_delimiter = function
+  | {pexp_desc=Pexp_constant (Pconst_string (_, d)); _} -> Some d
+  | _ -> None
+
 let get_lid = function
   | {pexp_desc=Pexp_ident{txt=id;_};_} ->
       Some (String.concat "." (Longident.flatten id))
