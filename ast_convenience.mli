@@ -83,6 +83,7 @@ val tconstr: string -> core_type list -> core_type
 (** {2 AST deconstruction} *)
 
 val get_str: expression -> string option
+val get_str_with_quotation_delimiter: expression -> (string * string option) option
 val get_lid: expression -> string option
 
 val has_attr: string -> attributes -> bool
