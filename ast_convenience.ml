@@ -26,51 +26,57 @@ module Label = struct
 end
 
 
-let may_tuple tup = function
+let may_tuple ?loc tup = function
   | [] -> None
   | [x] -> Some x
-  | l -> Some (tup ?loc:None ?attrs:None l)
+  | l -> Some (tup ?loc ?attrs:None l)
 
-let lid s = mkloc (Longident.parse s) !default_loc
-let constr s args = Exp.construct (lid s) (may_tuple Exp.tuple args)
-let nil () = constr "[]" []
-let unit () = constr "()" []
-let tuple l = match l with [] -> unit () | [x] -> x | xs -> Exp.tuple xs
-let cons hd tl = constr "::" [hd; tl]
-let list l = List.fold_right cons l (nil ())
-let str s = Exp.constant (Pconst_string (s, None))
-let int x = Exp.constant (Pconst_integer (string_of_int x, None))
-let char x = Exp.constant (Pconst_char x)
-let float x = Exp.constant (Pconst_float (string_of_float x, None))
-let record ?over l =
-  Exp.record (List.map (fun (s, e) -> (lid s, e)) l) over
-let func l = Exp.function_ (List.map (fun (p, e) -> Exp.case p e) l)
-let lam ?(label = Label.nolabel) ?default pat exp = Exp.fun_ label default pat exp
-let app f l = if l = [] then f else Exp.apply f (List.map (fun a -> Label.nolabel, a) l)
-let evar s = Exp.ident (lid s)
-let let_in ?(recursive = false) b body =
-  Exp.let_ (if recursive then Recursive else Nonrecursive) b body
+let lid ?(loc = !default_loc) s = mkloc (Longident.parse s) loc
+let constr ?loc ?attrs s args = Exp.construct ?loc ?attrs (lid ?loc s) (may_tuple ?loc Exp.tuple args)
+let nil ?loc ?attrs () = constr ?loc ?attrs "[]" []
+let unit ?loc ?attrs () = constr ?loc ?attrs "()" []
+let tuple ?loc ?attrs = function
+  | [] -> unit ?loc ?attrs ()
+  | [x] -> x
+  | xs -> Exp.tuple ?loc ?attrs xs
+let cons ?loc ?attrs hd tl = constr ?loc ?attrs "::" [hd; tl]
+let list ?loc ?attrs l = List.fold_right (cons ?loc ?attrs) l (nil ?loc ?attrs ())
+let str ?loc ?attrs s = Exp.constant ?loc ?attrs (Pconst_string (s, None))
+let int ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_integer (string_of_int x, None))
+let char ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_char x)
+let float ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_float (string_of_float x, None))
+let record ?loc ?attrs ?over l =
+  Exp.record ?loc ?attrs (List.map (fun (s, e) -> (lid ~loc:e.pexp_loc s, e)) l) over
+let func ?loc ?attrs l = Exp.function_ ?loc ?attrs (List.map (fun (p, e) -> Exp.case p e) l)
+let lam ?loc ?attrs ?(label = Label.nolabel) ?default pat exp = Exp.fun_ ?loc ?attrs label default pat exp
+let app ?loc ?attrs f l = if l = [] then f else Exp.apply ?loc ?attrs f (List.map (fun a -> Label.nolabel, a) l)
+let evar ?loc ?attrs s = Exp.ident ?loc ?attrs (lid ?loc s)
+let let_in ?loc ?attrs ?(recursive = false) b body =
+  Exp.let_ ?loc ?attrs (if recursive then Recursive else Nonrecursive) b body
 
-let sequence = function
-  | [] -> unit ()
-  | hd :: tl -> List.fold_left (fun e1 e2 -> Exp.sequence e1 e2) hd tl
+let sequence ?loc ?attrs = function
+  | [] -> unit ?loc ?attrs ()
+  | hd :: tl -> List.fold_left (fun e1 e2 -> Exp.sequence ?loc ?attrs e1 e2) hd tl
 
-let pvar s = Pat.var (mkloc s !default_loc)
-let pconstr s args = Pat.construct (lid s) (may_tuple Pat.tuple args)
-let precord ?(closed = Open) l =
-  Pat.record (List.map (fun (s, e) -> (lid s, e)) l) closed
-let pnil () = pconstr "[]" []
-let pcons hd tl = pconstr "::" [hd; tl]
-let punit () = pconstr "()" []
-let ptuple l = match l with [] -> punit () | [x] -> x | xs -> Pat.tuple xs
-let plist l = List.fold_right pcons l (pnil ())
+let pvar ?(loc = !default_loc) ?attrs s = Pat.var ~loc ?attrs (mkloc s loc)
+let pconstr ?loc ?attrs s args = Pat.construct ?loc ?attrs (lid ?loc s) (may_tuple ?loc Pat.tuple args)
+let precord ?loc ?attrs ?(closed = Open) l =
+  Pat.record ?loc ?attrs (List.map (fun (s, e) -> (lid ~loc:e.ppat_loc s, e)) l) closed
+let pnil ?loc ?attrs () = pconstr ?loc ?attrs "[]" []
+let pcons ?loc ?attrs hd tl = pconstr ?loc ?attrs "::" [hd; tl]
+let punit ?loc ?attrs () = pconstr ?loc ?attrs "()" []
+let ptuple ?loc ?attrs = function
+  | [] -> punit ?loc ?attrs ()
+  | [x] -> x
+  | xs -> Pat.tuple ?loc ?attrs xs
+let plist ?loc ?attrs l = List.fold_right (pcons ?loc ?attrs) l (pnil ?loc ?attrs ())
 
-let pstr s = Pat.constant (Pconst_string (s, None))
-let pint x = Pat.constant (Pconst_integer (string_of_int x, None))
-let pchar x = Pat.constant (Pconst_char x)
-let pfloat x = Pat.constant (Pconst_float (string_of_float x, None))
+let pstr ?loc ?attrs s = Pat.constant ?loc ?attrs (Pconst_string (s, None))
+let pint ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_integer (string_of_int x, None))
+let pchar ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_char x)
+let pfloat ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_float (string_of_float x, None))
 
-let tconstr c l = Typ.constr (lid c) l
+let tconstr ?loc ?attrs c l = Typ.constr ?loc ?attrs (lid ?loc c) l
 
 let get_str = function
   | {pexp_desc=Pexp_constant (Pconst_string (s, _)); _} -> Some s
