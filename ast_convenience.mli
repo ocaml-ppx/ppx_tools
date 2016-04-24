@@ -28,57 +28,57 @@ end
 
 (** {2 Misc} *)
 
-val lid: string -> lid
+val lid: ?loc:loc -> string -> lid
 
 (** {2 Expressions} *)
 
-val evar: string -> expression
-val let_in: ?recursive:bool -> value_binding list -> expression -> expression
+val evar: ?loc:loc -> ?attrs:attrs -> string -> expression
+val let_in: ?loc:loc -> ?attrs:attrs -> ?recursive:bool -> value_binding list -> expression -> expression
 
-val constr: string -> expression list -> expression
-val record: ?over:expression -> (string * expression) list -> expression
-val tuple: expression list -> expression
+val constr: ?loc:loc -> ?attrs:attrs -> string -> expression list -> expression
+val record: ?loc:loc -> ?attrs:attrs -> ?over:expression -> (string * expression) list -> expression
+val tuple: ?loc:loc -> ?attrs:attrs -> expression list -> expression
 
-val nil: unit -> expression
-val cons: expression -> expression -> expression
-val list: expression list -> expression
+val nil: ?loc:loc -> ?attrs:attrs -> unit -> expression
+val cons: ?loc:loc -> ?attrs:attrs -> expression -> expression -> expression
+val list: ?loc:loc -> ?attrs:attrs -> expression list -> expression
 
-val unit: unit -> expression
+val unit: ?loc:loc -> ?attrs:attrs -> unit -> expression
 
-val func: (pattern * expression) list -> expression
-val lam: ?label:Label.t -> ?default:expression -> pattern -> expression -> expression
-val app: expression -> expression list -> expression
+val func: ?loc:loc -> ?attrs:attrs -> (pattern * expression) list -> expression
+val lam: ?loc:loc -> ?attrs:attrs -> ?label:Label.t -> ?default:expression -> pattern -> expression -> expression
+val app: ?loc:loc -> ?attrs:attrs -> expression -> expression list -> expression
 
-val str: string -> expression
-val int: int -> expression
-val char: char -> expression
-val float: float -> expression
+val str: ?loc:loc -> ?attrs:attrs -> string -> expression
+val int: ?loc:loc -> ?attrs:attrs -> int -> expression
+val char: ?loc:loc -> ?attrs:attrs -> char -> expression
+val float: ?loc:loc -> ?attrs:attrs -> float -> expression
 
-val sequence: expression list -> expression
+val sequence: ?loc:loc -> ?attrs:attrs -> expression list -> expression
 (** Return [()] if the list is empty. Tail rec. *)
 
 (** {2 Patterns} *)
 
-val pvar: string -> pattern
-val pconstr: string -> pattern list -> pattern
-val precord: ?closed:closed_flag -> (string * pattern) list -> pattern
-val ptuple: pattern list -> pattern
+val pvar: ?loc:loc -> ?attrs:attrs -> string -> pattern
+val pconstr: ?loc:loc -> ?attrs:attrs -> string -> pattern list -> pattern
+val precord: ?loc:loc -> ?attrs:attrs -> ?closed:closed_flag -> (string * pattern) list -> pattern
+val ptuple: ?loc:loc -> ?attrs:attrs -> pattern list -> pattern
 
-val pnil: unit -> pattern
-val pcons: pattern -> pattern -> pattern
-val plist: pattern list -> pattern
+val pnil: ?loc:loc -> ?attrs:attrs -> unit -> pattern
+val pcons: ?loc:loc -> ?attrs:attrs -> pattern -> pattern -> pattern
+val plist: ?loc:loc -> ?attrs:attrs -> pattern list -> pattern
 
-val pstr: string -> pattern
-val pint: int -> pattern
-val pchar: char -> pattern
-val pfloat: float -> pattern
+val pstr: ?loc:loc -> ?attrs:attrs -> string -> pattern
+val pint: ?loc:loc -> ?attrs:attrs -> int -> pattern
+val pchar: ?loc:loc -> ?attrs:attrs -> char -> pattern
+val pfloat: ?loc:loc -> ?attrs:attrs -> float -> pattern
 
-val punit: unit -> pattern
+val punit: ?loc:loc -> ?attrs:attrs -> unit -> pattern
 
 
 (** {2 Types} *)
 
-val tconstr: string -> core_type list -> core_type
+val tconstr: ?loc:loc -> ?attrs:attrs -> string -> core_type list -> core_type
 
 (** {2 AST deconstruction} *)
 
