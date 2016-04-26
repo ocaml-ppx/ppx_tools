@@ -26,6 +26,13 @@ module Label : sig
 
 end
 
+(** {2 Deconstruction functions for Asttypes.constant types} *)
+module Constant : sig 
+	val get_char: constant -> char option 
+	val get_int: constant -> int option 
+	val get_str: constant -> string option
+end 
+
 (** {2 Misc} *)
 
 val lid: string -> lid
@@ -85,6 +92,8 @@ val tconstr: string -> core_type list -> core_type
 val get_str: expression -> string option
 val get_str_with_quotation_delimiter: expression -> (string * string option) option
 val get_lid: expression -> string option
+
+(** {AST deconstruction functions for Asttypes.Constant types} *)
 
 val has_attr: string -> attributes -> bool
 val find_attr: string -> attributes -> payload option

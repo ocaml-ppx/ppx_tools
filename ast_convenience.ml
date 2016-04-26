@@ -28,6 +28,11 @@ module Label = struct
 
 end
 
+module Constant = struct 
+  let get_char = function Const_char c -> Some c | _ -> None 
+  let get_int = function Const_int i -> Some i | _ -> None
+  let get_str = function Const_string(s, _) -> Some s | _ -> None 
+end 
 
 let may_tuple tup = function
   | [] -> None
