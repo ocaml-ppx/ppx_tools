@@ -26,18 +26,14 @@ module Label : sig
 
 end
 
-(** {2 Deconstruction functions for Asttypes.constant types} *)
-module Constant : sig 
-	val get_char: constant -> char option 
-	val get_int: constant -> int option 
-	val get_str: constant -> string option
-end 
+(** {2 Provides abstraction over Asttypes.constant type }*)
+val constant_type : constant -> Asttypes.constant
 
 (** {2 Misc} *)
 
 val lid: string -> lid
 
-(** {2 Expressions} *)
+(** {2 Expressions. } *)
 
 val evar: string -> expression
 val let_in: ?recursive:bool -> value_binding list -> expression -> expression
