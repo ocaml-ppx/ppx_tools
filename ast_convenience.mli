@@ -4,9 +4,9 @@
 
 (** {1 Convenience functions to help build and deconstruct AST fragments.} *)
 
-open Parsetree
 open Asttypes
 open Ast_helper
+open Parsetree   (* Open Parsetree after Asttypes since parsetree overrides constant type in 'ocaml 4.03' *)
 
 (** {2 Compatibility modules} *)
 
@@ -25,6 +25,9 @@ module Label : sig
   val optional : string -> t
 
 end
+
+(** {2 Provides abstraction over Asttypes.constant type }*)
+val constant_type : constant -> Asttypes.constant
 
 (** {2 Misc} *)
 
