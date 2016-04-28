@@ -37,6 +37,10 @@ module Constant : sig
   
   (** Translate ocaml version specific constant type to Constant.t *)
   val constant_type : constant -> t
+
+  (** Translate from Constant.t to constant(Parsetree.constant *)
+  val to_constant : t -> constant
+
 end
 
 (** {2 Misc} *)

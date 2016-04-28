@@ -33,6 +33,9 @@ module Constant = struct
    | Pconst_float of string * char option 
 
   let constant_type x = x 
+
+  let to_constant x = x
+
 end 
 
 let may_tuple ?loc tup = function
