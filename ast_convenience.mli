@@ -34,11 +34,11 @@ module Constant : sig
    | Pconst_char of char 
    | Pconst_string of string * string option 
    | Pconst_float of string * char option 
-  
-  (** Translate ocaml version specific constant type to Constant.t *)
-  val constant_type : constant -> t
+ 
+  (** Convert Asttypes.constant to Constant.t *) 
+  val of_constant : constant -> t
 
-  (** Translate from Constant.t to constant(Parsetree.constant *)
+  (** Convert Constant.t to Asttypes.constant *)
   val to_constant : t -> constant
 
 end
@@ -96,8 +96,6 @@ val punit: ?loc:loc -> ?attrs:attrs -> unit -> pattern
 (** {2 Types} *)
 
 val tconstr: ?loc:loc -> ?attrs:attrs -> string -> core_type list -> core_type
-
-(** {2 AST deconstruction} *)
 
 val get_str: expression -> string option
 val get_str_with_quotation_delimiter: expression -> (string * string option) option
