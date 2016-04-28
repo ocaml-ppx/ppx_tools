@@ -28,7 +28,23 @@ module Label = struct
 
 end
 
-let constant_type c = c 
+module Constant = struct 
+  type t = 
+     Pconst_integer of string * char option 
+   | Pconst_char of char 
+   | Pconst_string of string * string option 
+   | Pconst_float of string * char option 
+
+  let constant_type = function       
+    | Asttypes.Const_int32(i) -> Pconst_integer(Int32.to_string i, Some 'l')
+    | Asttypes.Const_int64(i) -> Pconst_integer(Int64.to_string i, Some 'L')
+    | Asttypes.Const_nativeint(i) -> Pconst_integer(Nativeint.to_string i, Some 'n')
+    | Asttypes.Const_int(i) -> Pconst_integer(string_of_int i, None)
+    | Asttypes.Const_char c -> Pconst_char c 
+    | Asttypes.Const_string(s, s_opt) -> Pconst_string(s, s_opt) 
+    | Asttypes.Const_float f -> Pconst_float(f, None)
+
+end   
 
 let may_tuple tup = function
   | [] -> None
