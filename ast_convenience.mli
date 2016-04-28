@@ -33,11 +33,13 @@ module Constant : sig
    | Pconst_char of char 
    | Pconst_string of string * string option 
    | Pconst_float of string * char option 
-  
-  (** Convert Asttypes.constant to Constant.t *)
+
+  exception Unknown_literal of string * char
+
+  (** Converts Asttypes.constant to Constant.t *)
   val of_constant : constant -> t
 
-  (** Convert Constant.t to Asttypes.constant *)
+  (** Converts Constant.t to Asttypes.constant. Raises Unknown_literal if conversion fails *)
   val to_constant : t -> constant 
 end
 
