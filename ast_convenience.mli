@@ -27,7 +27,7 @@ module Label : sig
 end
 
 (** {2 Provides a unified abstraction over differences in Parsetree.constant and Asttypes.constant 
- * types defined in ocaml 4.03 and 4.02 respectively. }*)
+ * types defined in ocaml 4.03 and 4.02 respectively}*)
 module Constant : sig 
   type t = Parsetree.constant =
      Pconst_integer of string * char option 
@@ -96,6 +96,8 @@ val punit: ?loc:loc -> ?attrs:attrs -> unit -> pattern
 (** {2 Types} *)
 
 val tconstr: ?loc:loc -> ?attrs:attrs -> string -> core_type list -> core_type
+
+(** {2 AST deconstruction} *)
 
 val get_str: expression -> string option
 val get_str_with_quotation_delimiter: expression -> (string * string option) option
