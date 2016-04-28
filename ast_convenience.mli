@@ -34,8 +34,11 @@ module Constant : sig
    | Pconst_string of string * string option 
    | Pconst_float of string * char option 
   
-  (** Translate ocaml version specific constant type to Constant.t *)
-  val constant_type : constant -> t
+  (** Convert Asttypes.constant to Constant.t *)
+  val of_constant : constant -> t
+
+  (** Convert Constant.t to Asttypes.constant *)
+  val to_constant : t -> constant 
 end
 
 (** {2 Misc} *)
