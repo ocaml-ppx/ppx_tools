@@ -25,15 +25,15 @@ module Label = struct
 
 end
 
-  (** : constant -> Asttypes.constant *)
-let constant_type = function 
-  | Pconst_integer(s, Some 'l') -> Asttypes.Const_int32 (Int32.of_string s)
-  | Pconst_integer(s, Some 'L') -> Asttypes.Const_int64 (Int64.of_string s)
-  | Pconst_integer(s, Some 'n') -> Asttypes.Const_nativeint (Nativeint.of_string s)
-  | Pconst_integer(s, _ ) -> Asttypes.Const_int (int_of_string s)
-  | Pconst_char c -> Asttypes.Const_char c 
-  | Pconst_string(s, s_option) -> Asttypes.Const_string(s, s_option)
-  | Pconst_float(s, _) -> Asttypes.Const_float s
+module Constant = struct 
+  type t = Parsetree.constant =
+     Pconst_integer of string * char option 
+   | Pconst_char of char 
+   | Pconst_string of string * string option 
+   | Pconst_float of string * char option 
+
+  let constant_type x = x 
+end 
 
 let may_tuple ?loc tup = function
   | [] -> None
