@@ -293,6 +293,10 @@ module E = struct
     | Pexp_letmodule (s, me, e) ->
         letmodule ~loc ~attrs (map_loc sub s) (sub # module_expr me)
           (sub # expr e)
+    | Pexp_letexception (cd, e) ->
+        letexception ~loc ~attrs
+          (sub # extension_constructor cd)
+          (sub # expr e)
     | Pexp_assert e -> assert_ ~loc ~attrs (sub # expr e)
     | Pexp_lazy e -> lazy_ ~loc ~attrs (sub # expr e)
     | Pexp_poly (e, t) ->
