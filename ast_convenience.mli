@@ -6,7 +6,7 @@
 
 open Asttypes
 open Ast_helper
-open Parsetree   (* Open Parsetree after Asttypes since parsetree overrides constant type in 'ocaml 4.03' *)
+open Parsetree
 
 (** {2 Compatibility modules} *)
 
@@ -36,10 +36,10 @@ module Constant : sig
    | Pconst_float of string * char option 
  
   (** Convert Asttypes.constant to Constant.t *) 
-  val of_constant : constant -> t
+  val of_constant : Parsetree.constant -> t
 
   (** Convert Constant.t to Asttypes.constant *)
-  val to_constant : t -> constant
+  val to_constant : t -> Parsetree.constant
 
 end
 
