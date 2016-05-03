@@ -28,6 +28,48 @@ module Label = struct
 
 end
 
+module Constant = struct 
+  type t = 
+     Pconst_integer of string * char option 
+   | Pconst_char of char 
+   | Pconst_string of string * string option 
+   | Pconst_float of string * char option
+
+  exception Unknown_literal of string * char 
+
+  (** Backport Int_literal_converter from ocaml 4.03 - 
+   * https://github.com/ocaml/ocaml/blob/trunk/utils/misc.ml#L298 *)
+  module Int_literal_converter = struct 
+    let cvt_int_aux str neg of_string = 
+      if String.length str = 0 || str.[0] = '-'
+      then of_string str 
+      else neg (of_string ("-" ^ str))
+    let int s = cvt_int_aux s (~-) int_of_string 
+    let int32 s = cvt_int_aux s Int32.neg Int32.of_string 
+    let int64 s = cvt_int_aux s Int64.neg Int64.of_string 
+    let nativeint s = cvt_int_aux s Nativeint.neg Nativeint.of_string 
+  end 
+
+  let of_constant = function       
+    | Asttypes.Const_int32(i) -> Pconst_integer(Int32.to_string i, Some 'l')
+    | Asttypes.Const_int64(i) -> Pconst_integer(Int64.to_string i, Some 'L')
+    | Asttypes.Const_nativeint(i) -> Pconst_integer(Nativeint.to_string i, Some 'n')
+    | Asttypes.Const_int(i) -> Pconst_integer(string_of_int i, None)
+    | Asttypes.Const_char c -> Pconst_char c 
+    | Asttypes.Const_string(s, s_opt) -> Pconst_string(s, s_opt) 
+    | Asttypes.Const_float f -> Pconst_float(f, None)
+
+  let to_constant = function 
+    | Pconst_integer(i,Some 'l') -> Asttypes.Const_int32 (Int_literal_converter.int32 i)
+    | Pconst_integer(i,Some 'L') -> Asttypes.Const_int64 (Int_literal_converter.int64 i)
+    | Pconst_integer(i,Some 'n') -> Asttypes.Const_nativeint (Int_literal_converter.nativeint i)
+    | Pconst_integer(i,None) -> Asttypes.Const_int (Int_literal_converter.int i)
+    | Pconst_integer(i,Some c) -> raise (Unknown_literal (i, c))
+    | Pconst_char c -> Asttypes.Const_char c 
+    | Pconst_string(s,d) -> Asttypes.Const_string(s, d)
+    | Pconst_float(f,None) -> Asttypes.Const_float f
+    | Pconst_float(f,Some c) -> raise (Unknown_literal (f, c))
+end   
 
 let may_tuple tup = function
   | [] -> None

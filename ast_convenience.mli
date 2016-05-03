@@ -26,6 +26,23 @@ module Label : sig
 
 end
 
+(** {2 Provides abstraction over Asttypes.constant type }*)
+module Constant : sig 
+  type t = 
+     Pconst_integer of string * char option 
+   | Pconst_char of char 
+   | Pconst_string of string * string option 
+   | Pconst_float of string * char option 
+
+  exception Unknown_literal of string * char
+
+  (** Converts Asttypes.constant to Constant.t *)
+  val of_constant : constant -> t
+
+  (** Converts Constant.t to Asttypes.constant. Raises Unknown_literal if conversion fails *)
+  val to_constant : t -> constant 
+end
+
 (** {2 Misc} *)
 
 val lid: string -> lid
