@@ -49,8 +49,8 @@ module Main : sig end = struct
   let rec gen ty =
     if Hashtbl.mem printed ty then ()
     else let tylid = Longident.parse ty in
-      let (_, td) =
-        try Env.lookup_type tylid env
+      let td =
+        try Env.find_type (Env.lookup_type tylid env) env
         with Not_found ->
           Format.eprintf "** Cannot resolve type %s@." ty;
           exit 2
