@@ -59,6 +59,19 @@
 
 *)
 
+#if OCAML_VERSION < "4.03"
+
+module Const = struct
+
+  let int32 x = Asttypes.Const_int32 x
+  let int64 x = Asttypes.Const_int64 x
+  let nativeint x = Asttypes.Const_nativeint x
+
+  end
+
+#endif
+
+
 module Main : sig end = struct
   open Asttypes
   open Parsetree
@@ -73,7 +86,8 @@ module Main : sig end = struct
 
   let append ?loc ?attrs e e' =
     let fn = Location.mknoloc (Longident.(Ldot (Lident "List", "append"))) in
-    Exp.apply ?loc ?attrs (Exp.ident fn) [Nolabel, e; Nolabel, e']
+    Exp.apply ?loc ?attrs (Exp.ident fn)
+      [Label.explode Label.Nolabel, e; Label.explode Label.Nolabel, e']
 
   class exp_builder =
     object
@@ -218,10 +232,12 @@ module Main : sig end = struct
                (exp_lifter !loc this) # lift_Parsetree_structure e
            | Pexp_extension({txt="stri";_}, PStr [e]) ->
                (exp_lifter !loc this) # lift_Parsetree_structure_item e
+#if OCAML_VERSION >= "4.03"
            | Pexp_extension({txt="sig";_}, PSig e) ->
                (exp_lifter !loc this) # lift_Parsetree_signature e
            | Pexp_extension({txt="sigi";_}, PSig [e]) ->
                (exp_lifter !loc this) # lift_Parsetree_signature_item e
+#endif
            | Pexp_extension({txt="type";loc=l}, e) ->
                (exp_lifter !loc this) # lift_Parsetree_core_type (get_typ l e)
            | _ ->
@@ -239,10 +255,12 @@ module Main : sig end = struct
                (pat_lifter this) # lift_Parsetree_structure e
            | Ppat_extension({txt="stri";_}, PStr [e]) ->
                (pat_lifter this) # lift_Parsetree_structure_item e
+#if OCAML_VERSION >= "4.03"
            | Ppat_extension({txt="sig";_}, PSig e) ->
                (pat_lifter this) # lift_Parsetree_signature e
            | Ppat_extension({txt="sigi";_}, PSig [e]) ->
                (pat_lifter this) # lift_Parsetree_signature_item e
+#endif
            | Ppat_extension({txt="type";loc=l}, e) ->
                (pat_lifter this) # lift_Parsetree_core_type (get_typ l e)
            | _ ->

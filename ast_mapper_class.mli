@@ -21,7 +21,11 @@ class mapper:
     method class_type: class_type -> class_type
     method class_type_declaration: class_type_declaration -> class_type_declaration
     method class_type_field: class_type_field -> class_type_field
+#if OCAML_VERSION >= "4.03"
     method constructor_arguments: constructor_arguments -> constructor_arguments
+#else
+   method constructor_arguments: core_type list -> core_type list
+#endif
     method constructor_declaration: constructor_declaration -> constructor_declaration
     method expr: expression -> expression
     method extension: extension -> extension
@@ -52,5 +56,4 @@ class mapper:
   end
 
 val to_mapper: #mapper -> Ast_mapper.mapper
-(** The resulting mapper is "closed", i.e. methods ignore
-    their first argument. *)
+(** The resulting mapper is "closed", i.e. methods ignore their first argument. *)

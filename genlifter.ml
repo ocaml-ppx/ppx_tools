@@ -38,19 +38,27 @@ module Main : sig end = struct
 
   let existential_method =
     Cf.(method_ (mknoloc "existential") Public
-          (virtual_ Typ.(poly ["a"] (arrow Nolabel (var "a") (var "res"))))
+          (virtual_ Typ.(poly ["a"] (arrow (Label.explode Label.Nolabel) (var "a") (var "res"))))
        )
 
   let arrow_method =
     Cf.(method_ (mknoloc "arrow") Public
-          (virtual_ Typ.(poly ["a"] (arrow Nolabel (var "a") (var "res"))))
+          (virtual_ Typ.(poly ["a"] (arrow (Label.explode Label.Nolabel) (var "a") (var "res"))))
        )
 
   let rec gen ty =
     if Hashtbl.mem printed ty then ()
     else let tylid = Longident.parse ty in
       let td =
-        try Env.find_type (Env.lookup_type tylid env) env
+        try
+          let path =
+#if OCAML_VERSION < "4.04"
+            fst (Env.lookup_type tylid env)
+#else
+            Env.lookup_type tylid env
+#endif
+          in
+          Env.find_type path env
         with Not_found ->
           Format.eprintf "** Cannot resolve type %s@." ty;
           exit 2
@@ -65,11 +73,13 @@ module Main : sig end = struct
       Hashtbl.add printed ty ();
       let params = List.mapi (fun i _ -> Printf.sprintf "f%i" i) td.type_params in
       let env = List.map2 (fun s t -> t.id, evar s) params td.type_params in
-      let make_result_t tyargs = Typ.(arrow Asttypes.Nolabel (constr (lid ty) tyargs) (var "res")) in
+      let make_result_t tyargs =
+        Typ.(arrow (Label.explode Label.Nolabel) (constr (lid ty) tyargs) (var "res")) in
       let make_t tyargs =
         List.fold_right
           (fun arg t ->
-             Typ.(arrow Asttypes.Nolabel (arrow Asttypes.Nolabel arg (var "res")) t))
+             Typ.(arrow (Label.explode Label.Nolabel)
+                    (arrow (Label.explode Label.Nolabel) arg (var "res")) t))
           tyargs (make_result_t tyargs)
       in
       let tyargs = List.map (fun t -> Typ.var t) params in
@@ -98,6 +108,7 @@ module Main : sig end = struct
           let case cd =
             let c = Ident.name cd.cd_id in
             let qc = prefix ^ c in
+#if OCAML_VERSION >= "4.03"
             match cd.cd_args with
             | Cstr_tuple (tys) ->
                 let p, args = gentuple env tys in
@@ -107,6 +118,10 @@ module Main : sig end = struct
                 pconstr qc [Pat.record (List.map fst l) Closed],
                 selfcall "constr" [str ty; tuple [str c;
                                                   selfcall "record" [str (ty ^ "." ^ c); list (List.map snd l)]]]
+#else
+                let p, args = gentuple env cd.cd_args in
+                pconstr qc p, selfcall "constr" [str ty; tuple[str c; list args]]
+#endif
           in
           concrete (func (List.map case l))
       | Type_abstract, Some t ->
@@ -175,12 +190,21 @@ module Main : sig end = struct
       let open Parsetree in
       match e.pexp_desc with
       | Pexp_fun
-          (Asttypes.Nolabel, None,
+#if OCAML_VERSION >= "4.03"
+          (Asttypes.Nolabel,
+           #else
+          ("",
+#endif
+           None,
            {ppat_desc = Ppat_var{txt=id;_};_},
            {pexp_desc =
               Pexp_apply
                 (f,
+#if OCAML_VERSION >= "4.03"
                  [Asttypes.Nolabel
+#else
+                  [""
+#endif
                  ,{pexp_desc= Pexp_ident{txt=Lident id2;_};_}]);_})
         when id = id2 -> f
       | _ -> e

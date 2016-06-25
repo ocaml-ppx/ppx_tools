@@ -9,34 +9,63 @@ open Ast_helper
 
 
 module Label = struct
-
+#if OCAML_VERSION >= "4.03"
   type t = Asttypes.arg_label
-
   type desc = Asttypes.arg_label =
+#else
+  type desc = Asttypes.label
+  type t =
+#endif
       Nolabel
     | Labelled of string
     | Optional of string
 
-  let explode x = x
 
   let nolabel = Nolabel
   let labelled x = Labelled x
   let optional x = Optional x
 
+#if OCAML_VERSION >= "4.03"
+  let explode x = x
+#else
+  let explode = function
+    | Nolabel -> ""
+    | Labelled s -> s
+    | Optional s -> "?" ^ s
+#endif
+
 end
 
-module Constant = struct 
+module Constant = struct
+#if OCAML_VERSION >= "4.03"
   type t = Parsetree.constant =
-     Pconst_integer of string * char option 
-   | Pconst_char of char 
-   | Pconst_string of string * string option 
-   | Pconst_float of string * char option 
+#else
+  type t =
+#endif
+     Pconst_integer of string * char option
+   | Pconst_char of char
+   | Pconst_string of string * string option
+   | Pconst_float of string * char option
 
-  let of_constant x = x 
-
+#if OCAML_VERSION >= "4.03"
   let to_constant x = x
+#else
+  let to_constant = function
+    | Pconst_string (s,so) -> Const_string (s,so)
+    | Pconst_integer (i,None) -> Const_int (int_of_string i)
+    | Pconst_char c -> Const_char c
+    | Pconst_float (f, None) -> Const_float f
+    | Pconst_integer (i, Some 'l') -> Const_int32 (Int32.of_string i)
+    | Pconst_integer (i, Some 'L') -> Const_int64 (Int64.of_string i)
+    | Pconst_integer (i, Some 'n') -> Const_nativeint (Nativeint.of_string i)
+    | Pconst_integer _ -> failwith "Pconst_integer wrong suffix"
+    | Pconst_float _ -> failwith "Pconst_float wrong suffix"
+#endif
+  let of_constant x = x
 
-end 
+end
+
+open Constant
 
 let may_tuple ?loc tup = function
   | [] -> None
@@ -53,15 +82,20 @@ let tuple ?loc ?attrs = function
   | xs -> Exp.tuple ?loc ?attrs xs
 let cons ?loc ?attrs hd tl = constr ?loc ?attrs "::" [hd; tl]
 let list ?loc ?attrs l = List.fold_right (cons ?loc ?attrs) l (nil ?loc ?attrs ())
-let str ?loc ?attrs s = Exp.constant ?loc ?attrs (Pconst_string (s, None))
-let int ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_integer (string_of_int x, None))
-let char ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_char x)
-let float ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_float (string_of_float x, None))
+let str ?loc ?attrs s = Exp.constant ?loc ?attrs
+    (Constant.to_constant (Pconst_string (s, None)))
+let int ?loc ?attrs x = Exp.constant ?loc ?attrs
+    (Constant.to_constant (Pconst_integer (string_of_int x, None)))
+let char ?loc ?attrs x = Exp.constant ?loc ?attrs
+    (Constant.to_constant (Pconst_char x))
+let float ?loc ?attrs x = Exp.constant ?loc ?attrs
+    (Constant.to_constant (Pconst_float (string_of_float x, None)))
 let record ?loc ?attrs ?over l =
   Exp.record ?loc ?attrs (List.map (fun (s, e) -> (lid ~loc:e.pexp_loc s, e)) l) over
 let func ?loc ?attrs l = Exp.function_ ?loc ?attrs (List.map (fun (p, e) -> Exp.case p e) l)
-let lam ?loc ?attrs ?(label = Label.nolabel) ?default pat exp = Exp.fun_ ?loc ?attrs label default pat exp
-let app ?loc ?attrs f l = if l = [] then f else Exp.apply ?loc ?attrs f (List.map (fun a -> Label.nolabel, a) l)
+let lam ?loc ?attrs ?(label = Label.nolabel) ?default pat exp =
+  Exp.fun_ ?loc ?attrs (Label.explode label) default pat exp
+let app ?loc ?attrs f l = if l = [] then f else Exp.apply ?loc ?attrs f (List.map (fun a -> Label.explode Label.nolabel, a) l)
 let evar ?loc ?attrs s = Exp.ident ?loc ?attrs (lid ?loc s)
 let let_in ?loc ?attrs ?(recursive = false) b body =
   Exp.let_ ?loc ?attrs (if recursive then Recursive else Nonrecursive) b body
@@ -83,19 +117,31 @@ let ptuple ?loc ?attrs = function
   | xs -> Pat.tuple ?loc ?attrs xs
 let plist ?loc ?attrs l = List.fold_right (pcons ?loc ?attrs) l (pnil ?loc ?attrs ())
 
-let pstr ?loc ?attrs s = Pat.constant ?loc ?attrs (Pconst_string (s, None))
-let pint ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_integer (string_of_int x, None))
-let pchar ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_char x)
-let pfloat ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_float (string_of_float x, None))
+let pstr ?loc ?attrs s = Pat.constant ?loc ?attrs
+    (Constant.to_constant (Pconst_string (s, None)))
+let pint ?loc ?attrs x = Pat.constant ?loc ?attrs
+    (Constant.to_constant (Pconst_integer (string_of_int x, None)))
+let pchar ?loc ?attrs x = Pat.constant ?loc ?attrs
+    (Constant.to_constant (Pconst_char x))
+let pfloat ?loc ?attrs x = Pat.constant ?loc ?attrs
+    (Constant.to_constant (Pconst_float (string_of_float x, None)))
 
 let tconstr ?loc ?attrs c l = Typ.constr ?loc ?attrs (lid ?loc c) l
 
 let get_str = function
+#if OCAML_VERSION >= "4.03"
   | {pexp_desc=Pexp_constant (Pconst_string (s, _)); _} -> Some s
+#else
+  | {pexp_desc=Pexp_constant (Const_string (s, _)); _} -> Some s
+#endif
   | _ -> None
 
 let get_str_with_quotation_delimiter = function
+#if OCAML_VERSION >= "4.03"
   | {pexp_desc=Pexp_constant (Pconst_string (s, d)); _} -> Some (s, d)
+#else
+  | {pexp_desc=Pexp_constant (Const_string (s, d)); _} -> Some (s, d)
+#endif
   | _ -> None
 
 let get_lid = function
