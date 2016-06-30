@@ -174,7 +174,11 @@ module MT = struct
     let loc = sub # location loc in
     match desc with
     | Psig_value vd -> value ~loc (sub # value_description vd)
+#if OCAML_VERSION >= "4.03"
     | Psig_type (rf, l) -> type_ ~loc rf (List.map (sub # type_declaration) l)
+#else
+    | Psig_type l -> type_ ~loc (List.map (sub # type_declaration) l)
+#endif
     | Psig_typext te -> type_extension ~loc (sub # type_extension te)
     | Psig_exception ed -> exception_ ~loc (sub # extension_constructor ed)
     | Psig_module x -> module_ ~loc (sub # module_declaration x)
@@ -221,7 +225,11 @@ module M = struct
         eval ~loc ~attrs:(sub # attributes attrs) (sub # expr x)
     | Pstr_value (r, vbs) -> value ~loc r (List.map (sub # value_binding) vbs)
     | Pstr_primitive vd -> primitive ~loc (sub # value_description vd)
+#if OCAML_VERSION >= "4.03"
     | Pstr_type (rf, l) -> type_ ~loc rf (List.map (sub # type_declaration) l)
+#else
+    | Pstr_type l -> type_ ~loc (List.map (sub # type_declaration) l)
+#endif
     | Pstr_typext te -> type_extension ~loc (sub # type_extension te)
     | Pstr_exception ed -> exception_ ~loc (sub # extension_constructor ed)
     | Pstr_module x -> module_ ~loc (sub # module_binding x)
@@ -293,10 +301,12 @@ module E = struct
     | Pexp_letmodule (s, me, e) ->
         letmodule ~loc ~attrs (map_loc sub s) (sub # module_expr me)
           (sub # expr e)
+#if OCAML_VERSION >= "4.04"
     | Pexp_letexception (cd, e) ->
         letexception ~loc ~attrs
           (sub # extension_constructor cd)
           (sub # expr e)
+#endif
     | Pexp_assert e -> assert_ ~loc ~attrs (sub # expr e)
     | Pexp_lazy e -> lazy_ ~loc ~attrs (sub # expr e)
     | Pexp_poly (e, t) ->
@@ -307,7 +317,9 @@ module E = struct
     | Pexp_open (ovf, lid, e) ->
         open_ ~loc ~attrs ovf (map_loc sub lid) (sub # expr e)
     | Pexp_extension x -> extension ~loc ~attrs (sub # extension x)
+#if OCAML_VERSION >= "4.03"
     | Pexp_unreachable -> unreachable ~loc ~attrs ()
+#endif
 end
 
 module P = struct
@@ -339,7 +351,9 @@ module P = struct
     | Ppat_unpack s -> unpack ~loc ~attrs (map_loc sub s)
     | Ppat_exception p -> exception_ ~loc ~attrs (sub # pat p)
     | Ppat_extension x -> extension ~loc ~attrs (sub # extension x)
+#if OCAML_VERSION >= "4.04"
     | Ppat_open (l, p) -> open_ ~loc ~attrs (map_loc sub l) (sub # pat p)
+#endif
 end
 
 module CE = struct
@@ -475,9 +489,13 @@ class mapper =
         ~attrs:(this # attributes pvb_attributes)
         ~loc:(this # location pvb_loc)
 
+#if OCAML_VERSION >= "4.03"
     method constructor_arguments = function
       | Pcstr_tuple (tys) -> Pcstr_tuple (List.map (this # typ) tys)
       | Pcstr_record (ls) -> Pcstr_record (List.map (this # label_declaration) ls)
+#else
+    method constructor_arguments tys = List.map (this # typ) tys
+#endif
 
     method constructor_declaration {pcd_name; pcd_args; pcd_res; pcd_loc;
                                     pcd_attributes} =
@@ -534,7 +552,9 @@ class mapper =
       | PStr x -> PStr (this # structure x)
       | PTyp x -> PTyp (this # typ x)
       | PPat (x, g) -> PPat (this # pat x, map_opt (this # expr) g)
+#if OCAML_VERSION >= "4.03"
       | PSig x -> PSig (this # signature x)
+#endif
   end
 
 

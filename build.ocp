@@ -1,0 +1,46 @@
+
+
+comp = [ "-w" "+A-4-17-44-45" ];
+if ocaml_version >= "4.02" then {
+  comp += [ "-safe-string" ];
+}
+
+pp = "ocp-pp";
+
+begin library "ppx_tools";
+  files = [ "ast_convenience.ml" "ast_mapper_class.ml" ];
+  requires = [ "compiler-libs.bytecomp" ];
+end;
+
+begin program "genlifter";
+  files = [ "genlifter.ml" ];
+  requires = [ "ppx_tools" ];
+
+  build_rules = [
+    "ast_lifter.ml" (
+      sources = [ "%{genlifter_FULL_DST_DIR}%/genlifter.byte" ];
+      commands = [
+        { "%{genlifter_FULL_DST_DIR}%/genlifter.byte"
+            "-I" "%{OCAMLLIB}%/compiler-libs"
+            "-I" "%{OCAMLLIB}%"
+            "Parsetree.expression" } (stdout = "ast_lifter.ml" )
+      ]
+    )
+  ];
+
+end;
+
+begin program "dumpast";
+  files = [ "ast_lifter.ml" "dumpast.ml" ];
+  requires = [ "ppx_tools" ];
+end;
+
+begin program "ppx_metaquot";
+  files = [ "ast_lifter.ml" "ppx_metaquot.ml" ];
+  requires = [ "ppx_tools" ];
+end;;
+
+begin program "rewriter";
+  files = [ "rewriter.ml" ];
+  requires = [ "ppx_tools" ];
+end;

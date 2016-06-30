@@ -10,10 +10,15 @@ open Parsetree
 
 (** {2 Compatibility modules} *)
 
-module Label : sig
-  type t = Asttypes.arg_label
 
+module Label : sig
+#if OCAML_VERSION >= "4.03"
+  type t = Asttypes.arg_label
   type desc = Asttypes.arg_label =
+#else
+  type desc = Asttypes.label
+  type t =
+#endif
       Nolabel
     | Labelled of string
     | Optional of string
@@ -26,20 +31,26 @@ module Label : sig
 
 end
 
-(** {2 Provides a unified abstraction over differences in Parsetree.constant and Asttypes.constant 
- * types defined in ocaml 4.03 and 4.02 respectively}*)
-module Constant : sig 
+(** {2 Provides a unified abstraction over differences in Parsetree.constant and Asttypes.constant types defined in ocaml 4.03 and 4.02 respectively}*)
+module Constant : sig
+#if OCAML_VERSION >= "4.04"
   type t = Parsetree.constant =
-     Pconst_integer of string * char option 
-   | Pconst_char of char 
-   | Pconst_string of string * string option 
-   | Pconst_float of string * char option 
- 
-  (** Convert Asttypes.constant to Constant.t *) 
-  val of_constant : Parsetree.constant -> t
+#else
+  type t =
+#endif
+     Pconst_integer of string * char option
+   | Pconst_char of char
+   | Pconst_string of string * string option
+   | Pconst_float of string * char option
 
+#if OCAML_VERSION >= "4.03"
+  (** Convert Asttypes.constant to Constant.t *)
+  val of_constant : Parsetree.constant -> t
   (** Convert Constant.t to Asttypes.constant *)
   val to_constant : t -> Parsetree.constant
+#else
+  val to_constant : t -> Asttypes.constant
+#endif
 
 end
 

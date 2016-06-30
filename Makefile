@@ -6,87 +6,36 @@ include $(shell ocamlc -where)/Makefile.config
 
 PACKAGE = ppx_tools
 VERSION = 5.0
-# Don't forget to change META file as well
 
-OCAMLC = ocamlc -bin-annot
-OCAMLOPT = ocamlopt
 COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
 
 .PHONY: all
-all: genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) ast_mapper_class.cmo ppx_tools.cma
+all: _obuild
+	ocp-build
 
-ifneq ($(ARCH),none)
-all: ppx_tools.cmxa
-ifeq ($(NATDYNLINK),true)
-all: ppx_tools.cmxs
-endif
-endif
-
-genlifter$(EXE): ppx_tools.cma genlifter.cmo
-	$(OCAMLC) $(COMPFLAGS) -o genlifter$(EXE) ocamlcommon.cma ppx_tools.cma genlifter.cmo
-
-dumpast$(EXE): dumpast.cmo
-	$(OCAMLC) $(COMPFLAGS) -o dumpast$(EXE) ocamlcommon.cma ocamlbytecomp.cma ast_lifter.cmo dumpast.cmo
-
-ppx_metaquot$(EXE): ppx_metaquot.cmo
-	$(OCAMLC) $(COMPFLAGS) -o ppx_metaquot$(EXE) ocamlcommon.cma ppx_tools.cma ast_lifter.cmo ppx_metaquot.cmo
-
-rewriter$(EXE): rewriter.cmo
-	$(OCAMLC) $(COMPFLAGS) -o rewriter$(EXE) ocamlcommon.cma rewriter.cmo
-
-ast_lifter.ml: genlifter$(EXE)
-	./genlifter$(EXE) -I +compiler-libs Parsetree.expression > ast_lifter.ml || rm -rf ast_lifter.ml
-
-
-OBJS = ast_convenience.cmo ast_mapper_class.cmo
-
-ppx_tools.cma: $(OBJS)
-	$(OCAMLC) -a -o ppx_tools.cma $(OBJS)
-ppx_tools.cmxa: $(OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -a -o ppx_tools.cmxa $(OBJS:.cmo=.cmx)
-ppx_tools.cmxs: $(OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -shared -o ppx_tools.cmxs -linkall ppx_tools.cmxa
-
-
-.PHONY: depend
-depend:
-	touch ast_lifter.ml
-	ocamldep *.ml *.mli > .depend
--include .depend
-
+_obuild: Makefile
+	ocp-build init
 
 .PHONY: clean
 clean:
-	rm -f *.cm* *~ *.o *.obj *.a *.lib *.tar.gz *.cmxs *.cmt *.cmti
-	rm -f genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE)
-	rm -f ast_lifter.ml
-
-# Default rules
-
-.SUFFIXES: .ml .mli .cmo .cmi .cmx
-
-.ml.cmo:
-	$(OCAMLC) $(COMPFLAGS) -c $<
-
-.mli.cmi:
-	$(OCAMLC) $(COMPFLAGS) -c $<
-
-.ml.cmx:
-	$(OCAMLOPT) $(COMPFLAGS) -c $<
-
+	rm -rf ocp-build
 
 # Install/uninstall
 targets = $(1).mli $(1).cmi $(1).cmt $(1).cmti $(wildcard $(1).cmx)
 INSTALL = META \
-   genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) \
-   ppx_tools.cma $(wildcard ppx_tools.cmxa ppx_tools$(EXT_LIB)) \
-   $(wildcard ppx_tools.cmxs) \
-   $(call targets,ast_convenience) \
-   $(call targets,ast_mapper_class)
+   _obuild/ppx_tools/ppx_tools.cma \
+   $(wildcard _obuild/ppx_tools/ppx_tools.cmxa _obuild/ppx_tools/ppx_tools$(EXT_LIB)) \
+   $(wildcard _obuild/ppx_tools/ppx_tools.cmxs) \
+   $(call targets,_obuild/ppx_tools/ast_convenience) \
+   $(call targets,_obuild/ppx_tools/ast_mapper_class)
 
 .PHONY: install
 install:
 	ocamlfind install $(PACKAGE) $(INSTALL)
+	cp -f _obuild/genlifter/genlifter.asm $(BINDIR)/genlifter$(EXE)
+	cp -f _obuild/dumpast/dumpast.asm $(BINDIR)/dumpast$(EXE)
+	cp -f _obuild/ppx_metaquot/ppx_metaquot.asm $(BINDIR)/ppx_metaquot$(EXE)
+	cp -f _obuild/rewriter/rewriter.asm $(BINDIR)/rewriter$(EXE)
 
 .PHONY: uninstall
 uninstall:
@@ -101,7 +50,8 @@ DISTRIB = \
   genlifter.ml \
   ppx_metaquot.ml \
   rewriter.ml \
-  ast_mapper_class.ml ast_mapper_class.mli
+  ast_mapper_class.ml ast_mapper_class.mli \
+  build.ocp
 
 FPACKAGE = $(PACKAGE)-$(VERSION)
 
