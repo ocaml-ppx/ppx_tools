@@ -11,5 +11,6 @@ install: [[make "install"]]
 remove: [["ocamlfind" "remove" "ppx_tools"]]
 depends: [
   "ocamlfind" {>= "1.5.0"}
+  "ocp-build" {>= "1.99.17-beta"}
 ]
-available: ocaml-version >= "4.03.0"
+available: ocaml-version >= "4.02.0"
