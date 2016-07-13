@@ -26,7 +26,7 @@ supported extensions.
 
 Usage:
 
-    ocamlfind -c -package ppx_tools.metaquot my_ppx_code.ml
+    ocamlfind ocamlc -c -package ppx_tools.metaquot my_ppx_code.ml
 
 
 rewriter
