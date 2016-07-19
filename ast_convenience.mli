@@ -68,6 +68,8 @@ val app: ?loc:loc -> ?attrs:attrs -> expression -> expression list -> expression
 
 val str: ?loc:loc -> ?attrs:attrs -> string -> expression
 val int: ?loc:loc -> ?attrs:attrs -> int -> expression
+val int32: ?loc:loc -> ?attrs:attrs -> int32 -> expression
+val int64: ?loc:loc -> ?attrs:attrs -> int64 -> expression
 val char: ?loc:loc -> ?attrs:attrs -> char -> expression
 val float: ?loc:loc -> ?attrs:attrs -> float -> expression
 
