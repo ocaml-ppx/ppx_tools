@@ -43,6 +43,46 @@ module Constant : sig
 
 end
 
+(** Abstracts the addition of Ppat_open in OCaml 4.04. *)
+module Pattern : sig
+  type 'a loc = 'a Asttypes.loc
+  type constant = Constant.t
+
+  type t =
+      Ppat_any
+    | Ppat_var of string loc
+    | Ppat_alias of pattern * string loc
+    | Ppat_constant of constant
+    | Ppat_interval of constant * constant
+    | Ppat_tuple of pattern list
+    | Ppat_construct of Longident.t loc * pattern option
+    | Ppat_variant of label * pattern option
+    | Ppat_record of (Longident.t loc * pattern) list * closed_flag
+    | Ppat_array of pattern list
+    | Ppat_or of pattern * pattern
+    | Ppat_constraint of pattern * core_type
+    | Ppat_type of Longident.t loc
+    | Ppat_lazy of pattern
+    | Ppat_unpack of string loc
+    | Ppat_exception of pattern
+    | Ppat_extension of extension
+    | Ppat_open of Longident.t loc * pattern
+
+  val of_pattern_desc : Parsetree.pattern_desc -> t
+
+  (** Converts [Pattern.t] to [Parsetree.pattern_desc]. If the given value is
+      constructed with [Ppat_open] and the OCaml version is less than [4.04],
+      raises [Failure]. *)
+  val to_pattern_desc : t -> Parsetree.pattern_desc
+
+  (** [true] if and only if [Ppat_open] is available (OCaml >= [4.04]). *)
+  val have_ppat_open : bool
+
+  (** On OCaml >= [4.04], forwards to [Ast_helper.Pat.open_]. Otherwise, raises
+      [Failure]. *)
+  val open_ : ?loc:Ast_helper.loc -> ?attrs:attrs -> lid -> pattern -> pattern
+end
+
 (** {2 Misc} *)
 
 val lid: ?loc:loc -> string -> lid
