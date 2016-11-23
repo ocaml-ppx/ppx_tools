@@ -38,6 +38,81 @@ module Constant = struct
 
 end 
 
+module Pattern = struct
+  type 'a loc = 'a Asttypes.loc
+  type constant = Constant.t
+
+  type t =
+      Ppat_any
+    | Ppat_var of string loc
+    | Ppat_alias of pattern * string loc
+    | Ppat_constant of constant
+    | Ppat_interval of constant * constant
+    | Ppat_tuple of pattern list
+    | Ppat_construct of Longident.t loc * pattern option
+    | Ppat_variant of label * pattern option
+    | Ppat_record of (Longident.t loc * pattern) list * closed_flag
+    | Ppat_array of pattern list
+    | Ppat_or of pattern * pattern
+    | Ppat_constraint of pattern * core_type
+    | Ppat_type of Longident.t loc
+    | Ppat_lazy of pattern
+    | Ppat_unpack of string loc
+    | Ppat_exception of pattern
+    | Ppat_extension of extension
+    | Ppat_open of Longident.t loc * pattern
+
+  let of_pattern_desc = function
+    | Parsetree.Ppat_any -> (Ppat_any : t)
+    | Parsetree.Ppat_var s -> Ppat_var s
+    | Parsetree.Ppat_alias (p, s) -> Ppat_alias (p, s)
+    | Parsetree.Ppat_constant c -> Ppat_constant (Constant.of_constant c)
+    | Parsetree.Ppat_interval (c, c') ->
+      Ppat_interval (Constant.of_constant c, Constant.of_constant c')
+    | Parsetree.Ppat_tuple ps -> Ppat_tuple ps
+    | Parsetree.Ppat_construct (c, p) -> Ppat_construct (c, p)
+    | Parsetree.Ppat_variant (s, p) -> Ppat_variant (s, p)
+    | Parsetree.Ppat_record (fs, c) -> Ppat_record (fs, c)
+    | Parsetree.Ppat_array ps -> Ppat_array ps
+    | Parsetree.Ppat_or (p, p') -> Ppat_or (p, p')
+    | Parsetree.Ppat_constraint (p, t) -> Ppat_constraint (p, t)
+    | Parsetree.Ppat_type t -> Ppat_type t
+    | Parsetree.Ppat_lazy p -> Ppat_lazy p
+    | Parsetree.Ppat_unpack s -> Ppat_unpack s
+    | Parsetree.Ppat_exception p -> Ppat_exception p
+    | Parsetree.Ppat_extension e -> Ppat_extension e
+
+  let to_pattern_desc = function
+    | (Ppat_any : t) -> Parsetree.Ppat_any
+    | Ppat_var s -> Parsetree.Ppat_var s
+    | Ppat_alias (p, s) -> Parsetree.Ppat_alias (p, s)
+    | Ppat_constant c -> Parsetree.Ppat_constant (Constant.to_constant c)
+    | Ppat_interval (c, c') ->
+      Parsetree.Ppat_interval (Constant.to_constant c, Constant.to_constant c')
+    | Ppat_tuple ps -> Parsetree.Ppat_tuple ps
+    | Ppat_construct (c, p) -> Parsetree.Ppat_construct (c, p)
+    | Ppat_variant (s, p) -> Parsetree.Ppat_variant (s, p)
+    | Ppat_record (fs, c) -> Parsetree.Ppat_record (fs, c)
+    | Ppat_array ps -> Parsetree.Ppat_array ps
+    | Ppat_or (p, p') -> Parsetree.Ppat_or (p, p')
+    | Ppat_constraint (p, t) -> Parsetree.Ppat_constraint (p, t)
+    | Ppat_type t -> Parsetree.Ppat_type t
+    | Ppat_lazy p -> Parsetree.Ppat_lazy p
+    | Ppat_unpack s -> Parsetree.Ppat_unpack s
+    | Ppat_exception p -> Parsetree.Ppat_exception p
+    | Ppat_extension e -> Parsetree.Ppat_extension e
+    | Ppat_open _ ->
+      failwith
+        ("ppx_tools: Ast_convenience.Pattern.to_pattern_desc: " ^
+         "Ppat_open is not available in OCaml < 4.04")
+
+  let have_ppat_open = false
+  let open_ ?loc ?attrs _ _ =
+    failwith
+      ("ppx_tools: Ast_convenience.Pattern.open_: " ^
+       "Ppat_open is not available in OCaml < 4.04")
+end
+
 let may_tuple ?loc tup = function
   | [] -> None
   | [x] -> Some x
