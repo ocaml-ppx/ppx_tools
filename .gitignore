@@ -16,6 +16,8 @@ genlifter
 ppx_metaquot
 rewriter
 ast_lifter.ml
+OCamlFrontend402.ml
+OCamlFrontend402.mli
 OCamlFrontend403.ml
 OCamlFrontend403.mli
 OCamlFrontend404.ml

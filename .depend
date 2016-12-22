@@ -1,14 +1,33 @@
+OCamlFrontend402.cmo : OCamlFrontend402.cmi
+OCamlFrontend402.cmx : OCamlFrontend402.cmi
+OCamlFrontend402.cmi :
+OCamlFrontend403.cmo : OCamlFrontend403.cmi
+OCamlFrontend403.cmx : OCamlFrontend403.cmi
+OCamlFrontend403.cmi :
+OCamlFrontend404.cmo : OCamlFrontend404.cmi
+OCamlFrontend404.cmx : OCamlFrontend404.cmi
+OCamlFrontend404.cmi :
 ast_convenience.cmo : ast_convenience.cmi
 ast_convenience.cmx : ast_convenience.cmi
+ast_convenience.cmi :
 ast_lifter.cmo :
 ast_lifter.cmx :
 ast_mapper_class.cmo : ast_mapper_class.cmi
 ast_mapper_class.cmx : ast_mapper_class.cmi
+ast_mapper_class.cmi :
 dumpast.cmo : ast_lifter.cmo
 dumpast.cmx : ast_lifter.cmx
+gencopy.cmo : ast_convenience.cmi
+gencopy.cmx : ast_convenience.cmx
 genlifter.cmo : ast_convenience.cmi
 genlifter.cmx : ast_convenience.cmx
-ppx_metaquot.cmo : ast_lifter.cmo
-ppx_metaquot.cmx : ast_lifter.cmx
-ast_convenience.cmi :
-ast_mapper_class.cmi :
+migrate_parsetree_402_403.cmo : OCamlFrontend403.cmi OCamlFrontend402.cmi
+migrate_parsetree_402_403.cmx : OCamlFrontend403.cmx OCamlFrontend402.cmx
+migrate_parsetree_403_404.cmo : OCamlFrontend404.cmi OCamlFrontend403.cmi
+migrate_parsetree_403_404.cmx : OCamlFrontend404.cmx OCamlFrontend403.cmx
+migrate_parsetree_404_403.cmo : OCamlFrontend404.cmi OCamlFrontend403.cmi
+migrate_parsetree_404_403.cmx : OCamlFrontend404.cmx OCamlFrontend403.cmx
+ppx_metaquot.cmo : ast_lifter.cmo ast_convenience.cmi
+ppx_metaquot.cmx : ast_lifter.cmx ast_convenience.cmx
+rewriter.cmo :
+rewriter.cmx :
