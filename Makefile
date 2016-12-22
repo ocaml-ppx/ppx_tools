@@ -13,7 +13,7 @@ OCAMLOPT = ocamlopt
 COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
 
 .PHONY: all
-all: genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) ast_mapper_class.cmo ppx_tools.cma
+all: genlifter$(EXE) gencopy$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) ast_mapper_class.cmo ppx_tools.cma
 
 ifneq ($(ARCH),none)
 all: ppx_tools.cmxa
@@ -24,6 +24,13 @@ endif
 
 genlifter$(EXE): ppx_tools.cma genlifter.cmo
 	$(OCAMLC) $(COMPFLAGS) -o genlifter$(EXE) ocamlcommon.cma ppx_tools.cma genlifter.cmo
+
+gencopy$(EXE): ppx_tools.cma gencopy.cmo
+	$(OCAMLC) $(COMPFLAGS) -o gencopy$(EXE) ocamlcommon.cma ppx_tools.cma gencopy.cmo
+
+copy_parsetree.ml: gencopy$(EXE)
+	./gencopy$(EXE) -I +compiler-libs -map Parsetree:New.Parsetree Parsetree.expression > copy_parsetree.ml || rm -rf copy_parsetree.ml
+	$(OCAMLC) -c -I +compiler-libs copy_parsetree.ml
 
 dumpast$(EXE): dumpast.cmo
 	$(OCAMLC) $(COMPFLAGS) -o dumpast$(EXE) ocamlcommon.cma ocamlbytecomp.cma ast_lifter.cmo dumpast.cmo
