@@ -27,7 +27,7 @@ and copy_OCamlFrontend402_Parsetree_expression_desc :
            x0)
   | OCamlFrontend402.Parsetree.Pexp_constant x0 ->
       OCamlFrontend403.Parsetree.Pexp_constant
-        (copy_OCamlFrontend402_Asttypes_constant x0)
+        (copy_OCamlFrontend402_Asttypes_constant_OCamlFrontend403_Parsetree_constant x0)
   | OCamlFrontend402.Parsetree.Pexp_let (x0,x1,x2) ->
       OCamlFrontend403.Parsetree.Pexp_let
         ((copy_OCamlFrontend402_Asttypes_rec_flag x0),
@@ -38,7 +38,7 @@ and copy_OCamlFrontend402_Parsetree_expression_desc :
         (List.map copy_OCamlFrontend402_Parsetree_case x0)
   | OCamlFrontend402.Parsetree.Pexp_fun (x0,x1,x2,x3) ->
       OCamlFrontend403.Parsetree.Pexp_fun
-        ((copy_OCamlFrontend402_Asttypes_label x0),
+        ((copy_OCamlFrontend402_Asttypes_label_OCamlFrontend403_Asttypes_arg_label x0),
           (copy_option copy_OCamlFrontend402_Parsetree_expression x1),
           (copy_OCamlFrontend402_Parsetree_pattern x2),
           (copy_OCamlFrontend402_Parsetree_expression x3))
@@ -48,7 +48,7 @@ and copy_OCamlFrontend402_Parsetree_expression_desc :
           (List.map
              (fun x  ->
                 let (x0,x1) = x  in
-                ((copy_OCamlFrontend402_Asttypes_label x0),
+                ((copy_OCamlFrontend402_Asttypes_label_OCamlFrontend403_Asttypes_arg_label x0),
                   (copy_OCamlFrontend402_Parsetree_expression x1))) x1))
   | OCamlFrontend402.Parsetree.Pexp_match (x0,x1) ->
       OCamlFrontend403.Parsetree.Pexp_match
@@ -251,11 +251,11 @@ and copy_OCamlFrontend402_Parsetree_pattern_desc :
           (copy_OCamlFrontend402_Asttypes_loc (fun x  -> x) x1))
   | OCamlFrontend402.Parsetree.Ppat_constant x0 ->
       OCamlFrontend403.Parsetree.Ppat_constant
-        (copy_OCamlFrontend402_Asttypes_constant x0)
+        (copy_OCamlFrontend402_Asttypes_constant_OCamlFrontend403_Parsetree_constant x0)
   | OCamlFrontend402.Parsetree.Ppat_interval (x0,x1) ->
       OCamlFrontend403.Parsetree.Ppat_interval
-        ((copy_OCamlFrontend402_Asttypes_constant x0),
-          (copy_OCamlFrontend402_Asttypes_constant x1))
+        ((copy_OCamlFrontend402_Asttypes_constant_OCamlFrontend403_Parsetree_constant x0),
+          (copy_OCamlFrontend402_Asttypes_constant_OCamlFrontend403_Parsetree_constant x1))
   | OCamlFrontend402.Parsetree.Ppat_tuple x0 ->
       OCamlFrontend403.Parsetree.Ppat_tuple
         (List.map copy_OCamlFrontend402_Parsetree_pattern x0)
@@ -334,7 +334,7 @@ and copy_OCamlFrontend402_Parsetree_core_type_desc :
       OCamlFrontend403.Parsetree.Ptyp_var x0
   | OCamlFrontend402.Parsetree.Ptyp_arrow (x0,x1,x2) ->
       OCamlFrontend403.Parsetree.Ptyp_arrow
-        ((copy_OCamlFrontend402_Asttypes_label x0),
+        ((copy_OCamlFrontend402_Asttypes_label_OCamlFrontend403_Asttypes_arg_label x0),
           (copy_OCamlFrontend402_Parsetree_core_type x1),
           (copy_OCamlFrontend402_Parsetree_core_type x2))
   | OCamlFrontend402.Parsetree.Ptyp_tuple x0 ->
@@ -472,7 +472,8 @@ and copy_OCamlFrontend402_Parsetree_structure_item_desc :
         (copy_OCamlFrontend402_Parsetree_value_description x0)
   | OCamlFrontend402.Parsetree.Pstr_type x0 ->
       OCamlFrontend403.Parsetree.Pstr_type
-        (List.map copy_OCamlFrontend402_Parsetree_type_declaration x0)
+        (OCamlFrontend403.Asttypes.Recursive,
+         List.map copy_OCamlFrontend402_Parsetree_type_declaration x0)
   | OCamlFrontend402.Parsetree.Pstr_typext x0 ->
       OCamlFrontend403.Parsetree.Pstr_typext
         (copy_OCamlFrontend402_Parsetree_type_extension x0)
@@ -557,7 +558,7 @@ and copy_OCamlFrontend402_Parsetree_class_expr_desc :
         (copy_OCamlFrontend402_Parsetree_class_structure x0)
   | OCamlFrontend402.Parsetree.Pcl_fun (x0,x1,x2,x3) ->
       OCamlFrontend403.Parsetree.Pcl_fun
-        ((copy_OCamlFrontend402_Asttypes_label x0),
+        ((copy_OCamlFrontend402_Asttypes_label_OCamlFrontend403_Asttypes_arg_label x0),
           (copy_option copy_OCamlFrontend402_Parsetree_expression x1),
           (copy_OCamlFrontend402_Parsetree_pattern x2),
           (copy_OCamlFrontend402_Parsetree_class_expr x3))
@@ -567,7 +568,7 @@ and copy_OCamlFrontend402_Parsetree_class_expr_desc :
           (List.map
              (fun x  ->
                 let (x0,x1) = x  in
-                ((copy_OCamlFrontend402_Asttypes_label x0),
+                ((copy_OCamlFrontend402_Asttypes_label_OCamlFrontend403_Asttypes_arg_label x0),
                   (copy_OCamlFrontend402_Parsetree_expression x1))) x1))
   | OCamlFrontend402.Parsetree.Pcl_let (x0,x1,x2) ->
       OCamlFrontend403.Parsetree.Pcl_let
@@ -841,7 +842,8 @@ and copy_OCamlFrontend402_Parsetree_signature_item_desc :
         (copy_OCamlFrontend402_Parsetree_value_description x0)
   | OCamlFrontend402.Parsetree.Psig_type x0 ->
       OCamlFrontend403.Parsetree.Psig_type
-        (List.map copy_OCamlFrontend402_Parsetree_type_declaration x0)
+        (OCamlFrontend403.Asttypes.Recursive,
+         List.map copy_OCamlFrontend402_Parsetree_type_declaration x0)
   | OCamlFrontend402.Parsetree.Psig_typext x0 ->
       OCamlFrontend403.Parsetree.Psig_typext
         (copy_OCamlFrontend402_Parsetree_type_extension x0)
@@ -926,7 +928,7 @@ and copy_OCamlFrontend402_Parsetree_class_type_desc :
         (copy_OCamlFrontend402_Parsetree_class_signature x0)
   | OCamlFrontend402.Parsetree.Pcty_arrow (x0,x1,x2) ->
       OCamlFrontend403.Parsetree.Pcty_arrow
-        ((copy_OCamlFrontend402_Asttypes_label x0),
+        ((copy_OCamlFrontend402_Asttypes_label_OCamlFrontend403_Asttypes_arg_label x0),
           (copy_OCamlFrontend402_Parsetree_core_type x1),
           (copy_OCamlFrontend402_Parsetree_class_type x2))
   | OCamlFrontend402.Parsetree.Pcty_extension x0 ->
@@ -1207,7 +1209,7 @@ and copy_OCamlFrontend402_Parsetree_extension_constructor_kind :
   function
   | OCamlFrontend402.Parsetree.Pext_decl (x0,x1) ->
       OCamlFrontend403.Parsetree.Pext_decl
-        ((List.map copy_OCamlFrontend402_Parsetree_core_type x0),
+        (OCamlFrontend403.Parsetree.Pcstr_tuple (List.map copy_OCamlFrontend402_Parsetree_core_type x0),
           (copy_option copy_OCamlFrontend402_Parsetree_core_type x1))
   | OCamlFrontend402.Parsetree.Pext_rebind x0 ->
       OCamlFrontend403.Parsetree.Pext_rebind
@@ -1328,7 +1330,7 @@ and copy_OCamlFrontend402_Parsetree_constructor_declaration :
       OCamlFrontend403.Parsetree.pcd_name =
         (copy_OCamlFrontend402_Asttypes_loc (fun x  -> x) pcd_name);
       OCamlFrontend403.Parsetree.pcd_args =
-        (List.map copy_OCamlFrontend402_Parsetree_core_type pcd_args);
+        OCamlFrontend403.Parsetree.Pcstr_tuple (List.map copy_OCamlFrontend402_Parsetree_core_type pcd_args);
       OCamlFrontend403.Parsetree.pcd_res =
         (copy_option copy_OCamlFrontend402_Parsetree_core_type pcd_res);
       OCamlFrontend403.Parsetree.pcd_loc =
@@ -1381,7 +1383,19 @@ and copy_OCamlFrontend402_Asttypes_closed_flag :
 
 and copy_OCamlFrontend402_Asttypes_label :
   OCamlFrontend402.Asttypes.label -> OCamlFrontend403.Asttypes.label =
-  fun x  -> x
+  fun x ->
+    x
+
+and copy_OCamlFrontend402_Asttypes_label_OCamlFrontend403_Asttypes_arg_label :
+  OCamlFrontend402.Asttypes.label -> OCamlFrontend403.Asttypes.arg_label =
+  fun x ->
+    if x <> "" then
+      if x.[0] = '?' then OCamlFrontend403.Asttypes.Optional (String.sub x 1 (String.length x - 1))
+      else OCamlFrontend403.Asttypes.Labelled x
+    else
+      OCamlFrontend403.Asttypes.Nolabel
+
+
 
 and copy_OCamlFrontend402_Asttypes_rec_flag :
   OCamlFrontend402.Asttypes.rec_flag -> OCamlFrontend403.Asttypes.rec_flag =
@@ -1391,24 +1405,24 @@ and copy_OCamlFrontend402_Asttypes_rec_flag :
   | OCamlFrontend402.Asttypes.Recursive  ->
       OCamlFrontend403.Asttypes.Recursive
 
-and copy_OCamlFrontend402_Asttypes_constant :
-  OCamlFrontend402.Asttypes.constant -> OCamlFrontend403.Asttypes.constant =
+and copy_OCamlFrontend402_Asttypes_constant_OCamlFrontend403_Parsetree_constant :
+  OCamlFrontend402.Asttypes.constant -> OCamlFrontend403.Parsetree.constant =
   function
   | OCamlFrontend402.Asttypes.Const_int x0 ->
-      OCamlFrontend403.Asttypes.Const_int x0
+      OCamlFrontend403.Parsetree.Pconst_integer (string_of_int x0, None)
   | OCamlFrontend402.Asttypes.Const_char x0 ->
-      OCamlFrontend403.Asttypes.Const_char x0
+      OCamlFrontend403.Parsetree.Pconst_char x0
   | OCamlFrontend402.Asttypes.Const_string (x0,x1) ->
-      OCamlFrontend403.Asttypes.Const_string
+      OCamlFrontend403.Parsetree.Pconst_string
         (x0, (copy_option (fun x  -> x) x1))
   | OCamlFrontend402.Asttypes.Const_float x0 ->
-      OCamlFrontend403.Asttypes.Const_float x0
+      OCamlFrontend403.Parsetree.Pconst_float (x0, None)
   | OCamlFrontend402.Asttypes.Const_int32 x0 ->
-      OCamlFrontend403.Asttypes.Const_int32 x0
+      OCamlFrontend403.Parsetree.Pconst_integer (Int32.to_string x0, Some 'l')
   | OCamlFrontend402.Asttypes.Const_int64 x0 ->
-      OCamlFrontend403.Asttypes.Const_int64 x0
+      OCamlFrontend403.Parsetree.Pconst_integer (Int64.to_string x0, Some 'L')
   | OCamlFrontend402.Asttypes.Const_nativeint x0 ->
-      OCamlFrontend403.Asttypes.Const_nativeint x0
+      OCamlFrontend403.Parsetree.Pconst_integer (Nativeint.to_string x0, Some 'n')
 
 and copy_option : 'f0 'g0 . ('f0 -> 'g0) -> 'f0 option -> 'g0 option =
   fun f0  -> function | None  -> None | Some x0 -> Some (f0 x0)
@@ -1468,4 +1482,3 @@ and copy_Lexing_position : Lexing.position -> Lexing.position =
       Lexing.pos_bol = pos_bol;
       Lexing.pos_cnum = pos_cnum
     }
-
