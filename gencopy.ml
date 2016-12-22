@@ -56,7 +56,7 @@ module Main : sig end = struct
         try
           let (v1, v2) =
             List.find
-              (fun (v1, v2) ->
+              (fun (v1, _) ->
                  String.length v1 <= String.length prefix
                  && String.sub prefix 0 (String.length v1) = v1
               )
@@ -92,7 +92,6 @@ module Main : sig end = struct
 
       let concrete e =
         let e = List.fold_right (fun x e -> lam x e) (List.map (fun x -> pvar x) params_in) e in
-        let e = List.fold_right (fun x e -> Exp.newtype x e) (params_in @ params_out) e in
         let e = Exp.constraint_ e t in
         meths := Vb.mk (pvar funname) e :: !meths
       in

@@ -145,10 +145,8 @@ and copy_OCamlFrontend404_Parsetree_expression_desc :
         ((copy_OCamlFrontend404_Asttypes_loc (fun x  -> x) x0),
           (copy_OCamlFrontend404_Parsetree_module_expr x1),
           (copy_OCamlFrontend404_Parsetree_expression x2))
-  | OCamlFrontend404.Parsetree.Pexp_letexception (x0,x1) ->
-      OCamlFrontend403.Parsetree.Pexp_letexception
-        ((copy_OCamlFrontend404_Parsetree_extension_constructor x0),
-          (copy_OCamlFrontend404_Parsetree_expression x1))
+  | OCamlFrontend404.Parsetree.Pexp_letexception _ ->
+      failwith "Pexp_letexception not available in 4.03"
   | OCamlFrontend404.Parsetree.Pexp_assert x0 ->
       OCamlFrontend403.Parsetree.Pexp_assert
         (copy_OCamlFrontend404_Parsetree_expression x0)
@@ -310,11 +308,8 @@ and copy_OCamlFrontend404_Parsetree_pattern_desc :
   | OCamlFrontend404.Parsetree.Ppat_extension x0 ->
       OCamlFrontend403.Parsetree.Ppat_extension
         (copy_OCamlFrontend404_Parsetree_extension x0)
-  | OCamlFrontend404.Parsetree.Ppat_open (x0,x1) ->
-      OCamlFrontend403.Parsetree.Ppat_open
-        ((copy_OCamlFrontend404_Asttypes_loc
-            copy_OCamlFrontend404_Longident_t x0),
-          (copy_OCamlFrontend404_Parsetree_pattern x1))
+  | OCamlFrontend404.Parsetree.Ppat_open _ ->
+      failwith "Pexp_letexception not available in 4.03"
 
 and copy_OCamlFrontend404_Parsetree_core_type :
   OCamlFrontend404.Parsetree.core_type ->
@@ -1029,7 +1024,7 @@ and copy_OCamlFrontend404_Parsetree_class_infos :
     ('f0 -> 'g0) ->
       'f0 OCamlFrontend404.Parsetree.class_infos ->
         'g0 OCamlFrontend403.Parsetree.class_infos
-  = fun (type f0) -> fun (type g0) ->
+  =
   fun f0  ->
     fun
       { OCamlFrontend404.Parsetree.pci_virt = pci_virt;
@@ -1078,7 +1073,7 @@ and copy_OCamlFrontend404_Parsetree_include_infos :
     ('f0 -> 'g0) ->
       'f0 OCamlFrontend404.Parsetree.include_infos ->
         'g0 OCamlFrontend403.Parsetree.include_infos
-  = fun (type f0) -> fun (type g0) ->
+  =
   fun f0  ->
     fun
       { OCamlFrontend404.Parsetree.pincl_mod = pincl_mod;
@@ -1445,8 +1440,7 @@ and copy_OCamlFrontend404_Parsetree_constant :
       OCamlFrontend403.Parsetree.Pconst_float
         (x0, (copy_option (fun x  -> x) x1))
 
-and copy_option : 'f0 'g0 . ('f0 -> 'g0) -> 'f0 option -> 'g0 option = fun
-  (type f0) -> fun (type g0) ->
+and copy_option : 'f0 'g0 . ('f0 -> 'g0) -> 'f0 option -> 'g0 option =
   fun f0  -> function | None  -> None | Some x0 -> Some (f0 x0)
 
 and copy_OCamlFrontend404_Longident_t :
@@ -1466,7 +1460,7 @@ and copy_OCamlFrontend404_Asttypes_loc :
   'f0 'g0 .
     ('f0 -> 'g0) ->
       'f0 OCamlFrontend404.Asttypes.loc -> 'g0 OCamlFrontend403.Asttypes.loc
-  = fun (type f0) -> fun (type g0) ->
+  =
   fun f0  ->
     fun
       { OCamlFrontend404.Asttypes.txt = txt;
@@ -1504,4 +1498,3 @@ and copy_Lexing_position : Lexing.position -> Lexing.position =
       Lexing.pos_bol = pos_bol;
       Lexing.pos_cnum = pos_cnum
     }
-

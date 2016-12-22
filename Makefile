@@ -10,7 +10,7 @@ VERSION = 5.0
 
 OCAMLC = ocamlc -bin-annot
 OCAMLOPT = ocamlopt
-COMPFLAGS = -w +A-4-17-44-45 -I +compiler-libs -safe-string
+COMPFLAGS = -w +A-4-17-44-45-105 -I +compiler-libs -safe-string
 
 .PHONY: all
 all: genlifter$(EXE) gencopy$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) ast_mapper_class.cmo ppx_tools.cma
