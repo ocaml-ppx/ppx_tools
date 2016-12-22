@@ -28,10 +28,6 @@ genlifter$(EXE): ppx_tools.cma genlifter.cmo
 gencopy$(EXE): ppx_tools.cma gencopy.cmo
 	$(OCAMLC) $(COMPFLAGS) -o gencopy$(EXE) ocamlcommon.cma ppx_tools.cma gencopy.cmo
 
-copy_parsetree.ml: gencopy$(EXE)
-	./gencopy$(EXE) -I +compiler-libs -map Parsetree:New.Parsetree Parsetree.expression > copy_parsetree.ml || rm -rf copy_parsetree.ml
-	$(OCAMLC) -c -I +compiler-libs copy_parsetree.ml
-
 dumpast$(EXE): dumpast.cmo
 	$(OCAMLC) $(COMPFLAGS) -o dumpast$(EXE) ocamlcommon.cma ocamlbytecomp.cma ast_lifter.cmo dumpast.cmo
 
@@ -65,7 +61,8 @@ depend:
 .PHONY: clean
 clean:
 	rm -f *.cm* *~ *.o *.obj *.a *.lib *.tar.gz *.cmxs *.cmt *.cmti
-	rm -f genlifter$(EXE) dumpast$(EXE) ppx_metaquot$(EXE)
+	rm -f genlifter$(EXE) gencopy$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE)
+	rm -f OCamlFrontend*.ml OCamlFrontend*.mli
 	rm -f ast_lifter.ml
 
 # Default rules
@@ -125,3 +122,58 @@ package: clean
 TARGET=foo:bar/ppx_tools_data
 upload:
 	scp $(FPACKAGE).tar.gz $(TARGET)/
+
+
+# Snapshoted versions of Parsetree (and related modules) for different versions of OCaml
+
+OCamlFrontend404.mli:
+	(cd ocaml_parsetrees/4.04 && \
+	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
+	echo "module Location : sig" && cat location.mli && echo "end" && \
+	echo "module Longident : sig" && cat longident.mli && echo "end" && \
+	echo "module Asttypes : sig" && cat asttypes.mli && echo "end" && \
+	echo "module Parsetree : sig" && cat parsetree.mli && echo "end" && \
+	echo "" \
+	)> OCamlFrontend404.mli
+
+OCamlFrontend404.ml:
+	(cd ocaml_parsetrees/4.04 && \
+	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
+	echo "module Location = struct" && cat location.ml && echo "end" && \
+	echo "module Longident = struct" && cat longident.ml && echo "end" && \
+	echo "module Asttypes = struct" && cat asttypes.mli && echo "end" && \
+	echo "module Parsetree = struct" && cat parsetree.mli && echo "end" && \
+	echo "" \
+	)> OCamlFrontend404.ml
+
+OCamlFrontend403.mli:
+	(cd ocaml_parsetrees/4.03 && \
+	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
+	echo "module Location : sig" && cat location.mli && echo "end" && \
+	echo "module Longident : sig" && cat longident.mli && echo "end" && \
+	echo "module Asttypes : sig" && cat asttypes.mli && echo "end" && \
+	echo "module Parsetree : sig" && cat parsetree.mli && echo "end" && \
+	echo "" \
+	)> OCamlFrontend403.mli
+
+OCamlFrontend403.ml:
+	(cd ocaml_parsetrees/4.03 && \
+	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
+	echo "module Location = struct" && cat location.ml && echo "end" && \
+	echo "module Longident = struct" && cat longident.ml && echo "end" && \
+	echo "module Asttypes = struct" && cat asttypes.mli && echo "end" && \
+	echo "module Parsetree = struct" && cat parsetree.mli && echo "end" && \
+	echo "" \
+	)> OCamlFrontend403.ml
+
+## ./gencopy -I . -map OCamlFrontend403:OCamlFrontend404 OCamlFrontend403.Parsetree.expression > migrate_parsetree_403_404.ml
+## ./gencopy -I . -map OCamlFrontend404:OCamlFrontend403 OCamlFrontend404.Parsetree.expression > migrate_parsetree_404_403.ml
+
+OCAML_FRONTENDS = OCamlFrontend403.cmo OCamlFrontend404.cmo \
+	migrate_parsetree_403_404.cmo \
+	migrate_parsetree_404_403.cmo
+
+ocaml_frontends.cma: $(OCAML_FRONTENDS)
+	$(OCAMLC) -a -o ocaml_frontends.cma $(OCAML_FRONTENDS)
+ocaml_frontends.cmxa: $(OCAML_FRONTENDS:.cmo=.cmx)
+	$(OCAMLOPT) -a -o ocaml_frontends.cmxa $(OCAML_FRONTENDS:.cmo=.cmx)

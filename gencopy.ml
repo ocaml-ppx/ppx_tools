@@ -22,7 +22,7 @@ module Main : sig end = struct
 
   let env = Env.initial_safe_string
 
-  let module_mapping = Hashtbl.create 8
+  let module_mapping = ref []
 
   let clean s =
     let s = Bytes.of_string s in
@@ -53,8 +53,18 @@ module Main : sig end = struct
         | Lapply _ -> assert false
       in
       let target_prefix =
-        try Hashtbl.find module_mapping prefix
-        with Not_found -> prefix
+        try
+          let (v1, v2) =
+            List.find
+              (fun (v1, v2) ->
+                 String.length v1 <= String.length prefix
+                 && String.sub prefix 0 (String.length v1) = v1
+              )
+              !module_mapping
+          in
+          v2 ^ String.sub prefix (String.length v1) (String.length prefix - String.length v1)
+        with Not_found ->
+          prefix
       in
 
       let funname = print_fun ty in
@@ -186,9 +196,9 @@ module Main : sig end = struct
       with Not_found ->
         failwith (Printf.sprintf "Cannot parse mapping %S" s)
     in
-    Hashtbl.add module_mapping
-      (String.sub s 0 i ^ ".")
-      (String.sub s (i + 1) (String.length s - i - 1) ^ ".")
+    module_mapping :=
+      (String.sub s 0 i ^ ".",
+       String.sub s (i + 1) (String.length s - i - 1) ^ ".") :: !module_mapping
 
   let args =
     let open Arg in

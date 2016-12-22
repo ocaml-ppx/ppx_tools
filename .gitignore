@@ -1,3 +1,4 @@
+*~
 *.annot
 *.cmo
 *.cma
@@ -15,3 +16,7 @@ genlifter
 ppx_metaquot
 rewriter
 ast_lifter.ml
+OCamlFrontend403.ml
+OCamlFrontend403.mli
+OCamlFrontend404.ml
+OCamlFrontend404.mli
