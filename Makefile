@@ -123,7 +123,6 @@ OCAMLCURRENT=404
 OCAML_FRONTENDS=OCamlFrontend404.mli OCamlFrontend403.mli OCamlFrontend402.mli
 
 $(OCAML_FRONTENDS):
-	dos2unix build_frontends.sh
 	./build_frontends.sh $(OCAMLCURRENT)
 
 ## ./gencopy -I . -map OCamlFrontend403:OCamlFrontend404 OCamlFrontend403.Parsetree.expression > migrate_parsetree_403_404.ml
