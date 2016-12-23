@@ -137,16 +137,6 @@ OCamlFrontend404.mli:
 	echo "" \
 	)> OCamlFrontend404.mli
 
-OCamlFrontend404.ml:
-	(cd ocaml_parsetrees/4.04 && \
-	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
-	echo "module Location = struct" && cat location.ml && echo "end" && \
-	echo "module Longident = struct" && cat longident.ml && echo "end" && \
-	echo "module Asttypes = struct" && cat asttypes.mli && echo "end" && \
-	echo "module Parsetree = struct" && cat parsetree.mli && echo "end" && \
-	echo "" \
-	)> OCamlFrontend404.ml
-
 OCamlFrontend403.mli:
 	(cd ocaml_parsetrees/4.03 && \
 	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
@@ -156,16 +146,6 @@ OCamlFrontend403.mli:
 	echo "module Parsetree : sig" && cat parsetree.mli && echo "end" && \
 	echo "" \
 	)> OCamlFrontend403.mli
-
-OCamlFrontend403.ml:
-	(cd ocaml_parsetrees/4.03 && \
-	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
-	echo "module Location = struct" && cat location.ml && echo "end" && \
-	echo "module Longident = struct" && cat longident.ml && echo "end" && \
-	echo "module Asttypes = struct" && cat asttypes.mli && echo "end" && \
-	echo "module Parsetree = struct" && cat parsetree.mli && echo "end" && \
-	echo "" \
-	)> OCamlFrontend403.ml
 
 OCamlFrontend402.mli:
 	(cd ocaml_parsetrees/4.02 && \
@@ -177,30 +157,17 @@ OCamlFrontend402.mli:
 	echo "" \
 	)> OCamlFrontend402.mli
 
-OCamlFrontend402.ml:
-	(cd ocaml_parsetrees/4.02 && \
-	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
-	echo "module Location = struct" && cat location.ml && echo "end" && \
-	echo "module Longident = struct" && cat longident.ml && echo "end" && \
-	echo "module Asttypes = struct" && cat asttypes.mli && echo "end" && \
-	echo "module Parsetree = struct" && cat parsetree.mli && echo "end" && \
-	echo "" \
-	)> OCamlFrontend402.ml
-
 ## ./gencopy -I . -map OCamlFrontend403:OCamlFrontend404 OCamlFrontend403.Parsetree.expression > migrate_parsetree_403_404.ml
 ## ./gencopy -I . -map OCamlFrontend404:OCamlFrontend403 OCamlFrontend404.Parsetree.expression > migrate_parsetree_404_403.ml
 ## ./gencopy -I . -map OCamlFrontend402:OCamlFrontend403 OCamlFrontend402.Parsetree.expression > migrate_parsetree_402_403.ml
 
 .PHONY: frontends
 frontends: \
-  OCamlFrontend402.ml OCamlFrontend402.mli \
-  OCamlFrontend403.ml OCamlFrontend403.mli \
-  OCamlFrontend404.mli OCamlFrontend404.ml \
+  OCamlFrontend402.mli \
+  OCamlFrontend403.mli \
+  OCamlFrontend404.mli \
 
 OCAML_FRONTENDS = \
-        OCamlFrontend402.cmo \
-	OCamlFrontend403.cmo \
-	OCamlFrontend404.cmo \
 	migrate_parsetree_403_404.cmo \
 	migrate_parsetree_404_403.cmo \
 	migrate_parsetree_402_403.cmo
