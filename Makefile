@@ -13,10 +13,10 @@ OCAMLOPT = ocamlopt
 COMPFLAGS = -w +A-4-17-44-45-105 -I +compiler-libs -safe-string
 
 .PHONY: all
-all: genlifter$(EXE) gencopy$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) ast_mapper_class.cmo ppx_tools.cma ocaml_frontends.cma
+all: genlifter$(EXE) gencopy$(EXE) dumpast$(EXE) ppx_metaquot$(EXE) rewriter$(EXE) ast_mapper_class.cmo ppx_tools.cma migrate_parsetree.cma
 
 ifneq ($(ARCH),none)
-all: ppx_tools.cmxa ocaml_frontends.cmxa
+all: ppx_tools.cmxa migrate_parsetree.cmxa
 ifeq ($(NATDYNLINK),true)
 all: ppx_tools.cmxs
 endif
@@ -49,14 +49,6 @@ ppx_tools.cmxa: $(OBJS:.cmo=.cmx)
 	$(OCAMLOPT) -a -o ppx_tools.cmxa $(OBJS:.cmo=.cmx)
 ppx_tools.cmxs: $(OBJS:.cmo=.cmx)
 	$(OCAMLOPT) -shared -o ppx_tools.cmxs -linkall ppx_tools.cmxa
-
-
-.PHONY: depend
-depend: frontends
-	touch ast_lifter.ml
-	ocamldep *.ml *.mli > .depend
-	dos2unix .depend
--include .depend
 
 
 .PHONY: clean
@@ -127,52 +119,32 @@ upload:
 
 # Snapshoted versions of Parsetree (and related modules) for different versions of OCaml
 
-OCamlFrontend404.mli:
-	(cd ocaml_parsetrees/4.04 && \
-	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
-	echo "module Location : sig" && cat location.mli && echo "end" && \
-	echo "module Longident : sig" && cat longident.mli && echo "end" && \
-	echo "module Asttypes : sig" && cat asttypes.mli && echo "end" && \
-	echo "module Parsetree : sig" && cat parsetree.mli && echo "end" && \
-	echo "" \
-	)> OCamlFrontend404.mli
+OCAMLCURRENT=404
+OCAML_FRONTENDS=OCamlFrontend404.mli OCamlFrontend403.mli OCamlFrontend402.mli
 
-OCamlFrontend403.mli:
-	(cd ocaml_parsetrees/4.03 && \
-	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
-	echo "module Location : sig" && cat location.mli && echo "end" && \
-	echo "module Longident : sig" && cat longident.mli && echo "end" && \
-	echo "module Asttypes : sig" && cat asttypes.mli && echo "end" && \
-	echo "module Parsetree : sig" && cat parsetree.mli && echo "end" && \
-	echo "" \
-	)> OCamlFrontend403.mli
-
-OCamlFrontend402.mli:
-	(cd ocaml_parsetrees/4.02 && \
-	echo "(* GENERATED FILE.  DO NOT MODIFY BY HAND *)" && \
-	echo "module Location : sig" && cat location.mli && echo "end" && \
-	echo "module Longident : sig" && cat longident.mli && echo "end" && \
-	echo "module Asttypes : sig" && cat asttypes.mli && echo "end" && \
-	echo "module Parsetree : sig" && cat parsetree.mli && echo "end" && \
-	echo "" \
-	)> OCamlFrontend402.mli
+$(OCAML_FRONTENDS):
+	dos2unix build_frontends.sh
+	./build_frontends.sh $(OCAMLCURRENT)
 
 ## ./gencopy -I . -map OCamlFrontend403:OCamlFrontend404 OCamlFrontend403.Parsetree.expression > migrate_parsetree_403_404.ml
 ## ./gencopy -I . -map OCamlFrontend404:OCamlFrontend403 OCamlFrontend404.Parsetree.expression > migrate_parsetree_404_403.ml
 ## ./gencopy -I . -map OCamlFrontend402:OCamlFrontend403 OCamlFrontend402.Parsetree.expression > migrate_parsetree_402_403.ml
 
-.PHONY: frontends
-frontends: \
-  OCamlFrontend402.mli \
-  OCamlFrontend403.mli \
-  OCamlFrontend404.mli \
-
-OCAML_FRONTENDS = \
+MIGRATE_PARSETREE = \
 	migrate_parsetree_403_404.cmo \
 	migrate_parsetree_404_403.cmo \
 	migrate_parsetree_402_403.cmo
 
-ocaml_frontends.cma: $(OCAML_FRONTENDS)
-	$(OCAMLC) -a -o ocaml_frontends.cma $(OCAML_FRONTENDS)
-ocaml_frontends.cmxa: $(OCAML_FRONTENDS:.cmo=.cmx)
-	$(OCAMLOPT) -a -o ocaml_frontends.cmxa $(OCAML_FRONTENDS:.cmo=.cmx)
+migrate_parsetree.cma: $(MIGRATE_PARSETREE)
+	$(OCAMLC) -a -o migrate_parsetree.cma $(MIGRATE_PARSETREE)
+migrate_parsetree.cmxa: $(MIGRATE_PARSETREE:.cmo=.cmx)
+	$(OCAMLOPT) -a -o migrate_parsetree.cmxa $(MIGRATE_PARSETREE:.cmo=.cmx)
+
+
+
+.PHONY: depend
+depend: $(OCAML_FRONTENDS)
+	touch ast_lifter.ml
+	ocamldep *.ml *.mli > .depend
+	dos2unix .depend
+-include .depend
