@@ -17,6 +17,8 @@ Main contributors:
 
 Master : [![Build Status](https://travis-ci.org/alainfrisch/ppx_tools.svg?branch=master)](https://travis-ci.org/alainfrisch/ppx_tools)
 
+4.04 : [![Build Status](https://travis-ci.org/alainfrisch/ppx_tools.svg?branch=4.04)](https://travis-ci.org/alainfrisch/ppx_tools)
+
 4.03 : [![Build Status](https://travis-ci.org/alainfrisch/ppx_tools.svg?branch=4.03)](https://travis-ci.org/alainfrisch/ppx_tools)
 
 4.02 : [![Build Status](https://travis-ci.org/alainfrisch/ppx_tools.svg?branch=4.02)](https://travis-ci.org/alainfrisch/ppx_tools)
