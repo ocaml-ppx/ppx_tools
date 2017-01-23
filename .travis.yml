@@ -7,5 +7,6 @@ script: bash -ex .travis-docker.sh
 env:
  global:
    - PACKAGE="ppx_tools"
+   - PRE_INSTALL_HOOK="cd /home/opam/opam-repository && git pull origin master && opam update -u -y"
  matrix:
    - DISTRO=ubuntu-16.04 OCAML_VERSION=4.05.0
