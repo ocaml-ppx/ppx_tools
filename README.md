@@ -15,15 +15,17 @@ Main contributors:
   - Peter Zotov (whitequark)
   - Gabriel Radanne (Drup)
 
-Master : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=master)](https://travis-ci.org/alainfrisch/ppx_tools)
+Master : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=master)](https://travis-ci.org/ocaml-ppx/ppx_tools)
 
-4.05 : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=4.05)](https://travis-ci.org/alainfrisch/ppx_tools)
+4.06 : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=4.06)](https://travis-ci.org/ocaml-ppx/ppx_tools)
 
-4.04 : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=4.04)](https://travis-ci.org/alainfrisch/ppx_tools)
+4.05 : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=4.05)](https://travis-ci.org/ocaml-ppx/ppx_tools)
 
-4.03 : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=4.03)](https://travis-ci.org/alainfrisch/ppx_tools)
+4.04 : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=4.04)](https://travis-ci.org/ocaml-ppx/ppx_tools)
 
-4.02 : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=4.02)](https://travis-ci.org/alainfrisch/ppx_tools)
+4.03 : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=4.03)](https://travis-ci.org/ocaml-ppx/ppx_tools)
+
+4.02 : [![Build Status](https://travis-ci.org/ocaml-ppx/ppx_tools.svg?branch=4.02)](https://travis-ci.org/ocaml-ppx/ppx_tools)
 
 ppx_metaquot
 ------------
