@@ -24,6 +24,10 @@ module T = struct
         Rtag (l, sub # attributes attrs, b, List.map (sub # typ) tl)
     | Rinherit t -> Rinherit (sub # typ t)
 
+  let object_field sub = function
+    | Otag (s, a, t) -> Otag (s, sub # attributes a, sub # typ t)
+    | Oinherit t -> Oinherit (sub # typ t)
+
   let map sub {ptyp_desc = desc; ptyp_loc = loc; ptyp_attributes = attrs} =
     let open Typ in
     let loc = sub # location loc in
@@ -37,8 +41,7 @@ module T = struct
     | Ptyp_constr (lid, tl) ->
         constr ~loc ~attrs (map_loc sub lid) (List.map (sub # typ) tl)
     | Ptyp_object (l, o) ->
-        let f (s, a, t) = (s, sub # attributes a, sub # typ t) in
-        object_ ~loc ~attrs (List.map f l) o
+        object_ ~loc ~attrs (List.map (object_field sub) l) o
     | Ptyp_class (lid, tl) ->
         class_ ~loc ~attrs (map_loc sub lid) (List.map (sub # typ) tl)
     | Ptyp_alias (t, s) -> alias ~loc ~attrs (sub # typ t) s
@@ -119,6 +122,8 @@ module CT = struct
     | Pcty_arrow (lab, t, ct) ->
         arrow ~loc ~attrs lab (sub # typ t) (sub # class_type ct)
     | Pcty_extension x -> extension ~loc ~attrs (sub # extension x)
+    | Pcty_open (ovf, lid, ct) ->
+        open_ ~loc ~attrs ovf (map_loc sub lid) (sub # class_type ct)
 
   let map_field sub {pctf_desc = desc; pctf_loc = loc; pctf_attributes = attrs}
     =
@@ -165,9 +170,10 @@ module MT = struct
         Pwith_type (map_loc sub lid, sub # type_declaration d)
     | Pwith_module (lid, lid2) ->
         Pwith_module (map_loc sub lid, map_loc sub lid2)
-    | Pwith_typesubst d -> Pwith_typesubst (sub # type_declaration d)
-    | Pwith_modsubst (s, lid) ->
-        Pwith_modsubst (map_loc sub s, map_loc sub lid)
+    | Pwith_typesubst (lid, d) ->
+        Pwith_typesubst (map_loc sub lid, sub # type_declaration d)
+    | Pwith_modsubst (lid, lid2) ->
+        Pwith_modsubst (map_loc sub lid, map_loc sub lid2)
 
   let map_signature_item sub {psig_desc = desc; psig_loc = loc} =
     let open Sig in
@@ -367,6 +373,8 @@ module CE = struct
     | Pcl_constraint (ce, ct) ->
         constraint_ ~loc ~attrs (sub # class_expr ce) (sub # class_type ct)
     | Pcl_extension x -> extension ~loc ~attrs (sub # extension x)
+    | Pcl_open (ovf, lid, ce) ->
+        open_ ~loc ~attrs ovf (map_loc sub lid) (sub # class_expr ce)
 
   let map_kind sub = function
     | Cfk_concrete (o, e) -> Cfk_concrete (o, sub # expr e)
