@@ -104,9 +104,20 @@ module Main : sig end = struct
                 pconstr qc p, selfcall "constr" [str ty; tuple[str c; list args]]
             | Cstr_record (l) ->
                 let l = List.map field l in
-                pconstr qc [Pat.record (List.map fst l) Closed],
-                selfcall "constr" [str ty; tuple [str c;
-                                                  selfcall "record" [str (ty ^ "." ^ c); list (List.map snd l)]]]
+                let keep_head ((lid, pattern), _) =
+                  let name = match lid.txt with
+                    | Longident.Lident name -> name
+                    | Longident.Ldot (_, name) -> name
+                    | Longident.Lapply _ -> assert false
+                  in
+                  ({lid with txt = Longident.Lident name}, pattern)
+                in
+                pconstr qc [Pat.record (List.map keep_head l) Closed],
+                selfcall "constr"
+                  [str ty;
+                   tuple [str c;
+                          list [selfcall "record"
+                                  [str ""; list (List.map snd l)]]]]
           in
           concrete (func (List.map case l))
       | Type_abstract, Some t ->
