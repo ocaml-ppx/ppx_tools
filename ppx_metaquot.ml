@@ -282,5 +282,5 @@ module Main : sig end = struct
     in
     {super with expr; pat; structure; structure_item; signature; signature_item}
 
-  let () = Ast_mapper.run_main expander
+  let () = Ast_mapper.register "ppx_metaquot" expander
 end

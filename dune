@@ -1,0 +1,58 @@
+(library
+ (public_name ppx_tools)
+ (synopsis "Tools for authors of ppx rewriters and other syntactic tools")
+ (wrapped false)
+ (modules ast_convenience ast_mapper_class)
+ (libraries compiler-libs.common))
+
+(rule
+ (with-stdout-to ast_lifter.ml
+  (run ./genlifter.exe -I +compiler-libs Parsetree.expression)))
+
+(library
+ (name ast_lifter)
+ (public_name ppx_tools.ast_lifter)
+ (modules ast_lifter)
+ (flags :standard -w -17)
+ (libraries compiler-libs.common))
+
+(library
+ (name micro_ppx_driver)
+ (public_name ppx_tools.micro-driver)
+ (synopsis "Micro ppx driver for using ppx_tools.metaquot with dune")
+ (modules micro_ppx_driver)
+ (libraries compiler-libs.common)
+ (ppx.driver
+  (main Micro_ppx_driver.run)))
+
+(library
+ (name ppx_metaquot)
+ (public_name ppx_tools.metaquot)
+ (synopsis "Meta-quotation: Parsetree manipulation using concrete syntax")
+ (modules ppx_metaquot)
+ (kind ppx_rewriter)
+ (ppx_runtime_libraries ppx_tools)
+ (libraries ppx_tools micro_ppx_driver ast_lifter))
+
+(executables
+ (names genlifter rewriter)
+ (modules genlifter rewriter)
+ (libraries compiler-libs.common ppx_tools))
+
+(executable
+ (name dumpast)
+ (modules dumpast)
+ (libraries compiler-libs.common compiler-libs.bytecomp ppx_tools ast_lifter))
+
+(executable
+ (name ppx_metaquot_standalone)
+ (modules ppx_metaquot_standalone)
+ (libraries ppx_metaquot micro_ppx_driver))
+
+(install
+ (section libexec)
+ (files
+  (dumpast.exe as dumpast)
+  (genlifter.exe as genlifter)
+  (rewriter.exe as rewriter)
+  (ppx_metaquot_standalone.exe as ppx_metaquot)))
