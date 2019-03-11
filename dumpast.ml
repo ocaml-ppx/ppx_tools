@@ -77,7 +77,7 @@ let args =
     "<pat> Dump AST for pattern <pat>.";
 
     "-t", String show_typ,
-    "<pat> Dump AST for type expression <typ>.";
+    "<typ> Dump AST for type expression <typ>.";
 
     "-loc_discard", Unit (fun () -> locs := `Discard),
     "  Discard location fields. (default)";
