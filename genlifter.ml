@@ -105,12 +105,8 @@ module Main : sig end = struct
             | Cstr_record (l) ->
                 let l = List.map field l in
                 let keep_head ((lid, pattern), _) =
-                  let name = match lid.txt with
-                    | Longident.Lident name -> name
-                    | Longident.Ldot (_, name) -> name
-                    | Longident.Lapply _ -> assert false
-                  in
-                  ({lid with txt = Longident.Lident name}, pattern)
+                  let txt = Longident.Lident (Longident.last lid.txt) in
+                  ({lid with txt}, pattern)
                 in
                 pconstr qc [Pat.record (List.map keep_head l) Closed],
                 selfcall "constr"
