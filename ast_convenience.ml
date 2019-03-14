@@ -25,18 +25,18 @@ module Label = struct
 
 end
 
-module Constant = struct 
+module Constant = struct
   type t = Parsetree.constant =
-     Pconst_integer of string * char option 
-   | Pconst_char of char 
-   | Pconst_string of string * string option 
-   | Pconst_float of string * char option 
+     Pconst_integer of string * char option
+   | Pconst_char of char
+   | Pconst_string of string * string option
+   | Pconst_float of string * char option
 
-  let of_constant x = x 
+  let of_constant x = x
 
   let to_constant x = x
 
-end 
+end
 
 let may_tuple ?loc tup = function
   | [] -> None
@@ -106,7 +106,7 @@ let get_lid = function
   | _ -> None
 
 let find_attr s attrs =
-  try Some (snd (List.find (fun (x, _) -> x.txt = s) attrs))
+  try Some ((List.find (fun {attr_name=x;_} -> x.txt = s) attrs).attr_payload)
   with Not_found -> None
 
 let expr_of_payload = function

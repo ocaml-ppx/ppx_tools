@@ -19,16 +19,27 @@ let map_loc sub {loc; txt} = {loc = sub # location loc; txt}
 module T = struct
   (* Type expressions for the core language *)
 
-  let row_field sub = function
-    | Rtag (l, attrs, b, tl) ->
-        Rtag (l, sub # attributes attrs, b, List.map (sub # typ) tl)
+  let row_field_desc sub = function
+    | Rtag (l, b, tl) -> Rtag (l, b, List.map (sub # typ) tl)
     | Rinherit t -> Rinherit (sub # typ t)
 
-  let object_field sub = function
-    | Otag (s, a, t) -> Otag (s, sub # attributes a, sub # typ t)
+  let row_field sub {prf_desc = desc; prf_loc = loc; prf_attributes = attrs} =
+    let desc = row_field_desc sub desc in
+    let loc = sub # location loc in
+    let attrs = sub # attributes attrs in
+    {prf_desc = desc; prf_loc = loc; prf_attributes = attrs}
+
+  let object_field_desc sub = function
+    | Otag (s, t) -> Otag (s, sub # typ t)
     | Oinherit t -> Oinherit (sub # typ t)
 
-  let map sub {ptyp_desc = desc; ptyp_loc = loc; ptyp_attributes = attrs} =
+  let object_field sub {pof_desc = desc; pof_loc = loc; pof_attributes = attrs} =
+    let desc = object_field_desc sub desc in
+    let loc = sub # location loc in
+    let attrs = sub # attributes attrs in
+    {pof_desc = desc; pof_loc = loc; pof_attributes = attrs}
+
+  let map sub {ptyp_desc = desc; ptyp_loc = loc; ptyp_loc_stack = _; ptyp_attributes = attrs} =
     let open Typ in
     let loc = sub # location loc in
     let attrs = sub # attributes attrs in
@@ -81,12 +92,14 @@ module T = struct
       {ptyext_path; ptyext_params;
        ptyext_constructors;
        ptyext_private;
+       ptyext_loc;
        ptyext_attributes} =
     Te.mk
       (map_loc sub ptyext_path)
       (List.map (sub # extension_constructor) ptyext_constructors)
       ~params:(List.map (map_fst (sub # typ)) ptyext_params)
       ~priv:ptyext_private
+      ~loc:(sub # location ptyext_loc)
       ~attrs:(sub # attributes ptyext_attributes)
 
   let map_extension_constructor_kind sub = function
@@ -106,6 +119,11 @@ module T = struct
       ~loc:(sub # location pext_loc)
       ~attrs:(sub # attributes pext_attributes)
 
+  let map_type_exception sub {ptyexn_constructor; ptyexn_loc; ptyexn_attributes} =
+    Te.mk_exception
+        (map_extension_constructor sub ptyexn_constructor)
+        ~loc:(sub # location ptyexn_loc)
+        ~attrs:(sub # attributes ptyexn_attributes)
 
 end
 
@@ -122,8 +140,8 @@ module CT = struct
     | Pcty_arrow (lab, t, ct) ->
         arrow ~loc ~attrs lab (sub # typ t) (sub # class_type ct)
     | Pcty_extension x -> extension ~loc ~attrs (sub # extension x)
-    | Pcty_open (ovf, lid, ct) ->
-        open_ ~loc ~attrs ovf (map_loc sub lid) (sub # class_type ct)
+    | Pcty_open (od, ct) ->
+        open_ ~loc ~attrs (sub # open_description od) (sub # class_type ct)
 
   let map_field sub {pctf_desc = desc; pctf_loc = loc; pctf_attributes = attrs}
     =
@@ -181,9 +199,11 @@ module MT = struct
     match desc with
     | Psig_value vd -> value ~loc (sub # value_description vd)
     | Psig_type (rf, l) -> type_ ~loc rf (List.map (sub # type_declaration) l)
+    | Psig_typesubst l -> type_subst ~loc (List.map (sub # type_declaration) l)
     | Psig_typext te -> type_extension ~loc (sub # type_extension te)
-    | Psig_exception ed -> exception_ ~loc (sub # extension_constructor ed)
+    | Psig_exception texn -> exception_ ~loc (sub # type_exception texn)
     | Psig_module x -> module_ ~loc (sub # module_declaration x)
+    | Psig_modsubst ms -> mod_subst ~loc (sub # module_substitution ms)
     | Psig_recmodule l ->
         rec_module ~loc (List.map (sub # module_declaration) l)
     | Psig_modtype x -> modtype ~loc (sub # module_type_declaration x)
@@ -196,7 +216,6 @@ module MT = struct
         extension ~loc (sub # extension x) ~attrs:(sub # attributes attrs)
     | Psig_attribute x -> attribute ~loc (sub # attribute x)
 end
-
 
 module M = struct
   (* Value expressions for the module language *)
@@ -229,11 +248,11 @@ module M = struct
     | Pstr_primitive vd -> primitive ~loc (sub # value_description vd)
     | Pstr_type (rf, l) -> type_ ~loc rf (List.map (sub # type_declaration) l)
     | Pstr_typext te -> type_extension ~loc (sub # type_extension te)
-    | Pstr_exception ed -> exception_ ~loc (sub # extension_constructor ed)
+    | Pstr_exception ed -> exception_ ~loc (sub # type_exception ed)
     | Pstr_module x -> module_ ~loc (sub # module_binding x)
     | Pstr_recmodule l -> rec_module ~loc (List.map (sub # module_binding) l)
     | Pstr_modtype x -> modtype ~loc (sub # module_type_declaration x)
-    | Pstr_open od -> open_ ~loc (sub # open_description od)
+    | Pstr_open od -> open_ ~loc (sub # open_declaration od)
     | Pstr_class l -> class_ ~loc (List.map (sub # class_declaration) l)
     | Pstr_class_type l ->
         class_type ~loc (List.map (sub # class_type_declaration) l)
@@ -246,7 +265,14 @@ end
 module E = struct
   (* Value expressions for the core language *)
 
-  let map sub {pexp_loc = loc; pexp_desc = desc; pexp_attributes = attrs} =
+  let map_binding_op sub {pbop_op = op; pbop_pat = pat; pbop_exp = exp; pbop_loc = loc} =
+    let op = map_loc sub op in
+    let pat = sub # pat pat in
+    let exp = sub # expr exp in
+    let loc = sub # location loc in
+    {pbop_op = op; pbop_pat = pat; pbop_exp = exp; pbop_loc = loc}
+
+  let map sub {pexp_loc = loc; pexp_loc_stack = _; pexp_desc = desc; pexp_attributes = attrs} =
     let open Exp in
     let loc = sub # location loc in
     let attrs = sub # attributes attrs in
@@ -310,8 +336,13 @@ module E = struct
     | Pexp_object cls -> object_ ~loc ~attrs (sub # class_structure cls)
     | Pexp_newtype (s, e) -> newtype ~loc ~attrs s (sub # expr e)
     | Pexp_pack me -> pack ~loc ~attrs (sub # module_expr me)
-    | Pexp_open (ovf, lid, e) ->
-        open_ ~loc ~attrs ovf (map_loc sub lid) (sub # expr e)
+    | Pexp_open (od, e) ->
+        open_ ~loc ~attrs (sub # open_declaration od) (sub # expr e)
+    | Pexp_letop x ->
+        let let_ = map_binding_op sub x.let_ in
+        let ands = List.map (map_binding_op sub) x.ands in
+        let body = sub # expr x.body in
+        letop ~loc ~attrs let_ ands body
     | Pexp_extension x -> extension ~loc ~attrs (sub # extension x)
     | Pexp_unreachable -> unreachable ~loc ~attrs ()
 end
@@ -319,7 +350,7 @@ end
 module P = struct
   (* Patterns *)
 
-  let map sub {ppat_desc = desc; ppat_loc = loc; ppat_attributes = attrs} =
+  let map sub {ppat_desc = desc; ppat_loc = loc; ppat_loc_stack = _; ppat_attributes = attrs} =
     let open Pat in
     let loc = sub # location loc in
     let attrs = sub # attributes attrs in
@@ -373,8 +404,8 @@ module CE = struct
     | Pcl_constraint (ce, ct) ->
         constraint_ ~loc ~attrs (sub # class_expr ce) (sub # class_type ct)
     | Pcl_extension x -> extension ~loc ~attrs (sub # extension x)
-    | Pcl_open (ovf, lid, ce) ->
-        open_ ~loc ~attrs ovf (map_loc sub lid) (sub # class_expr ce)
+    | Pcl_open (od, ce) ->
+        open_ ~loc ~attrs (sub # open_description od) (sub # class_expr ce)
 
   let map_kind sub = function
     | Cfk_concrete (o, e) -> Cfk_concrete (o, sub # expr e)
@@ -438,11 +469,14 @@ class mapper =
     method class_type_declaration = CE.class_infos this (this # class_type)
     method class_description = CE.class_infos this (this # class_type)
 
+    method binding_op = E.map_binding_op this
+
     method type_declaration = T.map_type_declaration this
     method type_kind = T.map_type_kind this
     method typ = T.map this
 
     method type_extension = T.map_type_extension this
+    method type_exception = T.map_type_exception this
     method extension_constructor = T.map_extension_constructor this
 
     method value_description {pval_name; pval_type; pval_prim; pval_loc;
@@ -463,6 +497,13 @@ class mapper =
         (this # module_type pmd_type)
         ~attrs:(this # attributes pmd_attributes)
         ~loc:(this # location pmd_loc)
+
+    method module_substitution {pms_name; pms_manifest; pms_attributes; pms_loc} =
+      Ms.mk
+        (map_loc this pms_name)
+        (map_loc this pms_manifest)
+        ~attrs:(this # attributes pms_attributes)
+        ~loc:(this # location pms_loc)
 
     method module_type_declaration {pmtd_name; pmtd_type; pmtd_attributes; pmtd_loc} =
       Mtd.mk
@@ -514,9 +555,16 @@ class mapper =
         pc_rhs = this # expr pc_rhs;
       }
 
+    method open_declaration
+        {popen_expr; popen_override; popen_attributes; popen_loc} =
+      Opn.mk (this # module_expr popen_expr)
+        ~override:popen_override
+        ~loc:(this # location popen_loc)
+        ~attrs:(this # attributes popen_attributes)
+
     method open_description
-        {popen_lid; popen_override; popen_attributes; popen_loc} =
-      Opn.mk (map_loc this popen_lid)
+        {popen_expr; popen_override; popen_attributes; popen_loc} =
+      Opn.mk (map_loc this popen_expr)
         ~override:popen_override
         ~loc:(this # location popen_loc)
         ~attrs:(this # attributes popen_attributes)
@@ -536,8 +584,16 @@ class mapper =
     method location l = l
 
     method extension (s, e) = (map_loc this s, this # payload e)
-    method attribute (s, e) = (map_loc this s, this # payload e)
+
+    method attribute a =
+      {
+        attr_name = map_loc this a.attr_name;
+        attr_payload = this # payload a.attr_payload;
+        attr_loc = this # location a.attr_loc;
+      }
+
     method attributes l = List.map (this # attribute) l
+
     method payload = function
       | PStr x -> PStr (this # structure x)
       | PTyp x -> PTyp (this # typ x)
@@ -551,6 +607,7 @@ let to_mapper this =
   {
     attribute = (fun _ -> this # attribute);
     attributes = (fun _ -> this # attributes);
+    binding_op = (fun _ -> this # binding_op);
     case = (fun _ -> this # case);
     cases = (fun _ -> this # cases);
     class_declaration = (fun _ -> this # class_declaration);
@@ -573,8 +630,10 @@ let to_mapper this =
     module_binding = (fun _ -> this # module_binding);
     module_declaration = (fun _ -> this # module_declaration);
     module_expr = (fun _ -> this # module_expr);
+    module_substitution = (fun _ -> this # module_substitution);
     module_type = (fun _ -> this # module_type);
     module_type_declaration = (fun _ -> this # module_type_declaration);
+    open_declaration = (fun _ -> this # open_declaration);
     open_description = (fun _ -> this # open_description);
     pat = (fun _ -> this # pat);
     payload = (fun _ -> this # payload);
@@ -584,6 +643,7 @@ let to_mapper this =
     structure_item = (fun _ -> this # structure_item);
     typ = (fun _ -> this # typ);
     type_declaration = (fun _ -> this # type_declaration);
+    type_exception = (fun _ -> this # type_exception);
     type_extension = (fun _ -> this # type_extension);
     type_kind = (fun _ -> this # type_kind);
     value_binding = (fun _ -> this # value_binding);

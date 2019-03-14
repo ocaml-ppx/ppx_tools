@@ -107,22 +107,22 @@ module Main : sig end = struct
   let get_exp loc = function
     | PStr [ {pstr_desc=Pstr_eval (e, _); _} ] -> e
     | _ ->
-        Format.eprintf "%aExpression expected@."
-          Location.print_error loc;
+        let report = Location.error ~loc "Expression expected." in
+        Location.print_report Format.err_formatter report;
         exit 2
 
   let get_typ loc = function
     | PTyp t -> t
     | _ ->
-        Format.eprintf "%aType expected@."
-          Location.print_error loc;
+        let report = Location.error ~loc "Type expected." in
+        Location.print_report Format.err_formatter report;
         exit 2
 
   let get_pat loc = function
     | PPat (t, None) -> t
     | _ ->
-        Format.eprintf "%aPattern expected@."
-          Location.print_error loc;
+        let report = Location.error ~loc "Pattern expected." in
+        Location.print_report Format.err_formatter report;
         exit 2
 
   let exp_lifter loc map =
@@ -162,7 +162,7 @@ module Main : sig end = struct
           sign (nil ())
 
       method! lift_Parsetree_core_type = function
-        | {ptyp_desc=Ptyp_extension({txt="t";loc}, e); _} -> map (get_exp loc e)
+        | {ptyp_desc=Ptyp_extension({txt="t";loc}, e); _} ->map (get_exp loc e)
         | x -> super # lift_Parsetree_core_type x
     end
 
@@ -193,7 +193,7 @@ module Main : sig end = struct
   let loc = ref (app (evar "Pervasives.!") [evar "Ast_helper.default_loc"])
 
   let handle_attr = function
-    | {txt="metaloc";loc=l}, e -> loc := get_exp l e
+    | {attr_name={txt="metaloc";loc=l}; attr_payload=e; _} -> loc := get_exp l e
     | _ -> ()
 
   let with_loc ?(attrs = []) f =

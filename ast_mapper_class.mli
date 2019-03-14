@@ -10,6 +10,7 @@ class mapper:
   object
     method attribute: attribute -> attribute
     method attributes: attribute list -> attribute list
+    method binding_op: binding_op -> binding_op
     method case: case -> case
     method cases: case list -> case list
     method class_declaration: class_declaration -> class_declaration
@@ -32,9 +33,11 @@ class mapper:
     method location: Location.t -> Location.t
     method module_binding: module_binding -> module_binding
     method module_declaration: module_declaration -> module_declaration
+    method module_substitution: module_substitution -> module_substitution
     method module_expr: module_expr -> module_expr
     method module_type: module_type -> module_type
     method module_type_declaration: module_type_declaration -> module_type_declaration
+    method open_declaration: open_declaration -> open_declaration
     method open_description: open_description -> open_description
     method pat: pattern -> pattern
     method payload: payload -> payload
@@ -44,6 +47,7 @@ class mapper:
     method structure_item: structure_item -> structure_item
     method typ: core_type -> core_type
     method type_declaration: type_declaration -> type_declaration
+    method type_exception: type_exception -> type_exception
     method type_extension: type_extension -> type_extension
     method type_kind: type_kind -> type_kind
     method value_binding: value_binding -> value_binding
