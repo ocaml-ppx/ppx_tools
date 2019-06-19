@@ -15,8 +15,10 @@ class out_value_builder =
       let x =
         List.filter (function (_, Oval_ellipsis) -> false | _ -> true) x
       in
-      Oval_record (List.map (fun (l, s) -> (Oide_ident l, s)) x)
-    method constr (_ty : string) (c, args) = Oval_constr (Oide_ident c, args)
+      let f (l, s) = Oide_ident { printed_name = l }, s in
+      Oval_record (List.map f x)
+    method constr (_ty : string) (c, args) =
+        Oval_constr (Oide_ident { printed_name = c }, args)
     method list x = Oval_list x
     method array x = Oval_list (Array.to_list x)
     method tuple x = Oval_tuple x
@@ -57,10 +59,10 @@ let show_file fn =
   Compenv.readenv Format.err_formatter (Compenv.Before_compile fn);
   let v =
     if Filename.check_suffix fn ".mli" then
-      let ast = Pparse.parse_interface ~tool_name:"ocamlc" Format.err_formatter fn in
+      let ast = Pparse.parse_interface ~tool_name:"ocamlc" fn in
       lift # lift_Parsetree_signature ast
     else if Filename.check_suffix fn ".ml" then
-      let ast = Pparse.parse_implementation ~tool_name:"ocamlc" Format.err_formatter fn in
+      let ast = Pparse.parse_implementation ~tool_name:"ocamlc" fn in
       lift # lift_Parsetree_structure ast
     else
       failwith (Printf.sprintf "Don't know what to do with file %s" fn)

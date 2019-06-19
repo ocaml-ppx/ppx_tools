@@ -104,10 +104,17 @@ module Main : sig end = struct
                 pconstr qc p, selfcall "constr" [str ty; tuple[str c; list args]]
             | Cstr_record (l) ->
                 let l = List.map field l in
-                pconstr qc [Pat.record (List.map fst l) Closed],
-                selfcall "constr" [str ty; tuple [str c;
-                                                  selfcall "record" [str (ty ^ "." ^ c); list (List.map snd l)]]]
-          in
+                let keep_head ((lid, pattern), _) =
+                      let txt = Longident.Lident (Longident.last lid.txt) in
+                      ({lid with txt}, pattern)
+                    in
+                    pconstr qc [Pat.record (List.map keep_head l) Closed],
+                    selfcall "constr"
+                      [str ty;
+                       tuple [str c;
+                              list [selfcall "record"
+                                      [str ""; list (List.map snd l)]]]]
+              in
           concrete (func (List.map case l))
       | Type_abstract, Some t ->
           concrete (tyexpr_fun env t)
@@ -190,7 +197,7 @@ module Main : sig end = struct
   let args =
     let open Arg in
     [
-      "-I", String (fun s -> Config.load_path := Misc.expand_directory Config.standard_library s :: !Config.load_path),
+      "-I", String (fun s -> Load_path.add_dir (Misc.expand_directory Config.standard_library s)),
       "<dir> Add <dir> to the list of include directories";
     ]
 
@@ -198,7 +205,7 @@ module Main : sig end = struct
     Printf.sprintf "%s [options] <type names>\n" Sys.argv.(0)
 
   let main () =
-    Config.load_path := [Config.standard_library];
+    Load_path.init [Config.standard_library];
     Arg.parse (Arg.align args) gen usage;
     let meths = !meths in
     let meths =
