@@ -190,7 +190,7 @@ module Main : sig end = struct
         | x -> super # lift_Parsetree_core_type x
     end
 
-  let loc = ref (app (evar "Pervasives.!") [evar "Ast_helper.default_loc"])
+  let loc = ref (app (evar "Stdlib.!") [evar "Ast_helper.default_loc"])
 
   let handle_attr = function
     | {attr_name={txt="metaloc";loc=l}; attr_payload=e; _} -> loc := get_exp l e
