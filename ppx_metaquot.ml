@@ -170,11 +170,20 @@ module Main : sig end = struct
     let map = map.Ast_mapper.pat map in
     object
       inherit [_] Ast_lifter.lifter as super
-      inherit pat_builder
+      inherit pat_builder as builder
 
       (* Special support for location and attributes in the generated AST *)
       method! lift_Location_t _ = Pat.any ()
       method! lift_Parsetree_attributes _ = Pat.any ()
+      method! record n fields =
+        let fields =
+          List.map (fun (name, pat) ->
+              match name with
+              | "pexp_loc_stack" | "ppat_loc_stack" | "ptyp_loc_stack" ->
+                 name, Pat.any ()
+              | _ -> name, pat) fields
+        in
+        builder#record n fields
 
       (* Support for antiquotations *)
       method! lift_Parsetree_expression = function
