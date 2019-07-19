@@ -11,5 +11,5 @@ build: [[make "all"]]
 install: [[make "install"]]
 depends: [
   "ocaml" {>= "4.08.0"}
-  "ocamlfind" {>= "1.5.0"}
+  "ocamlfind" {build & >= "1.5.0"}
 ]
