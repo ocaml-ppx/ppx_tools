@@ -5,6 +5,14 @@
  (modules ast_convenience ast_mapper_class)
  (libraries compiler-libs.common))
 
+(library
+ (name ppx_metaquot)
+ (public_name ppx_tools.metaquot)
+ (kind ppx_rewriter)
+ (modules ppx_metaquot)
+ (ppx.driver (main Ppx_metaquot.Main.main))
+ (libraries compiler-libs.common ppx_tools ast_lifter))
+
 (executable
  (name genlifter)
  (modules genlifter)
@@ -16,9 +24,9 @@
  (libraries compiler-libs.common compiler-libs.bytecomp ast_lifter))
 
 (executable
- (name ppx_metaquot)
- (modules ppx_metaquot)
- (libraries compiler-libs.common ppx_tools ast_lifter))
+ (name ppx_metaquot_main)
+ (modules ppx_metaquot_main)
+ (libraries ppx_metaquot))
 
 (executable
  (name rewriter)
@@ -31,6 +39,7 @@
 
 (library
  (name ast_lifter)
+ (public_name ppx_tools.ast_lifter)
  (wrapped false)
  (modules ast_lifter)
  (flags :standard -w -17)
@@ -41,5 +50,5 @@
  (files
   (genlifter.exe as genlifter)
   (dumpast.exe as dumpast)
-  (ppx_metaquot.exe as ppx_metaquot)
+  (ppx_metaquot_main.exe as ppx_metaquot)
   (rewriter.exe as rewriter)))
