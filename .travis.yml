@@ -9,4 +9,4 @@ env:
    - PACKAGE="ppx_tools"
    - PRE_INSTALL_HOOK="cd /home/opam/opam-repository && git pull origin master && opam update -u -y"
  matrix:
-   - DISTRO=ubuntu-16.04 OCAML_VERSION=4.10.0+beta1 OCAML_BETA=enable
+   - DISTRO=ubuntu-16.04 OCAML_VERSION=4.10.0+rc2 OCAML_BETA=enable
