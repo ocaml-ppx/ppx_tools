@@ -8,9 +8,12 @@
 (library
  (name ppx_metaquot)
  (public_name ppx_tools.metaquot)
+ (synopsis "Meta-quotation: Parsetree manipulation using concrete syntax")
+ (wrapped false)
  (kind ppx_rewriter)
  (modules ppx_metaquot)
  (ppx.driver (main Ppx_metaquot.Main.main))
+ (ppx_runtime_libraries ppx_tools)
  (libraries compiler-libs.common ppx_tools ast_lifter))
 
 (executable
