@@ -59,7 +59,9 @@
 
 *)
 
-module Main : sig end = struct
+module Main : sig
+  val main : unit -> unit
+end = struct
   open Asttypes
   open Parsetree
   open Ast_helper
@@ -282,5 +284,5 @@ module Main : sig end = struct
     in
     {super with expr; pat; structure; structure_item; signature; signature_item}
 
-  let () = Ast_mapper.run_main expander
+  let main () = Ast_mapper.run_main expander
 end
