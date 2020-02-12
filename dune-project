@@ -1,3 +1,3 @@
 (lang dune 1.6)
 (name ppx_tools)
-(version 6.0)
+(version 6.1)
