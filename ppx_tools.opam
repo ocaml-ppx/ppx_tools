@@ -9,6 +9,6 @@ bug-reports: "https://github.com/ocaml-ppx/ppx_tools/issues"
 dev-repo: "git://github.com/ocaml-ppx/ppx_tools.git"
 build: ["dune" "build" "-p" name "-j" jobs]
 depends: [
-  "ocaml" {>= "4.08.0"}
+  "ocaml" {>= "4.10.0"}
   "dune" {>= "1.6"}
 ]
