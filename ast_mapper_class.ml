@@ -603,6 +603,8 @@ class mapper =
       | PTyp x -> PTyp (this # typ x)
       | PPat (x, g) -> PPat (this # pat x, map_opt (this # expr) g)
       | PSig x -> PSig (this # signature x)
+
+    method constant (c : Parsetree.constant) = c
   end
 
 
@@ -623,6 +625,7 @@ let to_mapper this =
     class_type = (fun _ -> this # class_type);
     class_type_declaration = (fun _ -> this # class_type_declaration);
     class_type_field = (fun _ -> this # class_type_field);
+    constant = (fun _ -> this # constant);
     constructor_declaration = (fun _ -> this # constructor_declaration);
     expr = (fun _ -> this # expr);
     extension = (fun _ -> this # extension);
