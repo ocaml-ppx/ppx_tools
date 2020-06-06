@@ -10,6 +10,6 @@ dev-repo: "git://github.com/ocaml-ppx/ppx_tools.git"
 build: ["dune" "build" "-p" name "-j" jobs
     "@runtest" {with-test}]
 depends: [
-  "ocaml" {>= "4.10.0"}
+  "ocaml" {>= "4.08.0"}
   "dune" {>= "1.6"}
 ]

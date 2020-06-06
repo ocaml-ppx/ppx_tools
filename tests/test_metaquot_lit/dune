@@ -1,4 +1,5 @@
 (test
+  (enabled_if (>= %{ocaml_version} "4.11.0"))
   (name test_metaquot_lit)
   (flags -dsource)
   (preprocess (staged_pps ppx_tools.metaquot)))
