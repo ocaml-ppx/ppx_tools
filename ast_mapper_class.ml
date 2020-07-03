@@ -604,7 +604,11 @@ class mapper =
       | PPat (x, g) -> PPat (this # pat x, map_opt (this # expr) g)
       | PSig x -> PSig (this # signature x)
 
-    method constant (c : Parsetree.constant) = c
+    method constant = function
+      | Pconst_integer (str, suffix) -> Pconst_integer (str, suffix)
+      | Pconst_char c -> Pconst_char c
+      | Pconst_string (str, loc, delim) -> Pconst_string (str, this # location loc, delim)
+      | Pconst_float (str, suffix) -> Pconst_float (str, suffix)
   end
 
 
