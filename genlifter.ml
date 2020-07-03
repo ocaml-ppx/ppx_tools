@@ -48,7 +48,7 @@ module Main : sig end = struct
 
   let rec gen ty =
     if Hashtbl.mem printed ty then ()
-    else let tylid = Longident.parse ty in
+    else let tylid = Longident.parse ty [@ocaml.warning "-3"] in
       let td =
         try snd (Env.find_type_by_name tylid env)
         with Not_found ->

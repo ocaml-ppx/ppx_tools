@@ -32,7 +32,7 @@ module Constant : sig
   type t = Parsetree.constant =
      Pconst_integer of string * char option 
    | Pconst_char of char 
-   | Pconst_string of string * string option 
+   | Pconst_string of string * Location.t * string option
    | Pconst_float of string * char option 
  
   (** Convert Asttypes.constant to Constant.t *) 
