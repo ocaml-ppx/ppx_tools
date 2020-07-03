@@ -107,4 +107,5 @@ val get_lid: expression -> string option
 
 val has_attr: string -> attributes -> bool
 val find_attr: string -> attributes -> payload option
+val find_attr_loc: string -> attributes -> payload Location.loc option
 val find_attr_expr: string -> attributes -> expression option

@@ -1,0 +1,4 @@
+(test
+  (name test_metaquot_lit)
+  (flags -dsource)
+  (preprocess (staged_pps ppx_tools.metaquot)))
