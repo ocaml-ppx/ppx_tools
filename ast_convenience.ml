@@ -53,7 +53,7 @@ let tuple ?loc ?attrs = function
   | xs -> Exp.tuple ?loc ?attrs xs
 let cons ?loc ?attrs hd tl = constr ?loc ?attrs "::" [hd; tl]
 let list ?loc ?attrs l = List.fold_right (cons ?loc ?attrs) l (nil ?loc ?attrs ())
-let str ?loc ?attrs s = Exp.constant ?loc ?attrs (Pconst_string (s, Location.none, None))
+let str ?(loc = !default_loc) ?attrs s = Exp.constant ~loc ?attrs (Pconst_string (s, loc, None))
 let int ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_integer (string_of_int x, None))
 let int32 ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_integer (Int32.to_string x, Some 'l'))
 let int64 ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_integer (Int64.to_string x, Some 'L'))
@@ -85,7 +85,7 @@ let ptuple ?loc ?attrs = function
   | xs -> Pat.tuple ?loc ?attrs xs
 let plist ?loc ?attrs l = List.fold_right (pcons ?loc ?attrs) l (pnil ?loc ?attrs ())
 
-let pstr ?loc ?attrs s = Pat.constant ?loc ?attrs (Pconst_string (s, Location.none, None))
+let pstr ?(loc = !default_loc) ?attrs s = Pat.constant ~loc ?attrs (Pconst_string (s, loc, None))
 let pint ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_integer (string_of_int x, None))
 let pchar ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_char x)
 let pfloat ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_float (string_of_float x, None))
