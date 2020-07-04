@@ -1,3 +1,16 @@
+(* -*- tuareg -*- *)
+
+module J = Jbuild_plugin.V1
+
+let ver =
+  match Scanf.sscanf J.ocaml_version "%s@.%s@." (fun maj min -> maj ^ min) with
+  | "409" -> "408"
+  | v -> v
+;;
+
+Printf.ksprintf J.send {|
+(copy_files# %s/*.ml{,i})
+
 (library
  (public_name ppx_tools)
  (synopsis "Tools for authors of ppx rewriters and other syntactic tools")
@@ -55,3 +68,5 @@
   (dumpast.exe as dumpast)
   (ppx_metaquot_main.exe as ppx_metaquot)
   (rewriter.exe as rewriter)))
+|} ver
+
