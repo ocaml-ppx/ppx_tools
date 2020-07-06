@@ -1,21 +1,9 @@
-(* -*- tuareg -*- *)
-
-module J = Jbuild_plugin.V1
-
-let ver =
-  match Scanf.sscanf J.ocaml_version "%s@.%s@." (fun maj min -> maj ^ min) with
-  | "409" -> "408"
-  | v -> v
-;;
-
-Printf.ksprintf J.send {|
-(copy_files# %s/*.ml{,i})
-
 (library
  (public_name ppx_tools)
  (synopsis "Tools for authors of ppx rewriters and other syntactic tools")
  (wrapped false)
  (modules ast_convenience ast_mapper_class)
+ (preprocess (action (run %{bin:cppo} -V OCAML:%{ocaml_version} %{input-file})))
  (libraries compiler-libs.common))
 
 (library
@@ -32,6 +20,7 @@ Printf.ksprintf J.send {|
 (executable
  (name genlifter)
  (modules genlifter)
+ (preprocess (action (run %{bin:cppo} -V OCAML:%{ocaml_version} %{input-file})))
  (libraries compiler-libs.common ppx_tools))
 
 (executable
@@ -68,5 +57,3 @@ Printf.ksprintf J.send {|
   (dumpast.exe as dumpast)
   (ppx_metaquot_main.exe as ppx_metaquot)
   (rewriter.exe as rewriter)))
-|} ver
-

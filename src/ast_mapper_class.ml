@@ -162,6 +162,12 @@ module CT = struct
       (List.map (sub # class_type_field) pcsig_fields)
 end
 
+#if OCAML_VERSION >= (4, 10, 0)
+let map_functor_param sub = function
+  | Unit -> Unit
+  | Named (s, mt) -> Named (map_loc sub s, sub # module_type mt)
+#endif
+
 module MT = struct
   (* Type expressions for the module language *)
 
@@ -173,10 +179,17 @@ module MT = struct
     | Pmty_ident s -> ident ~loc ~attrs (map_loc sub s)
     | Pmty_alias s -> alias ~loc ~attrs (map_loc sub s)
     | Pmty_signature sg -> signature ~loc ~attrs (sub # signature sg)
+#if OCAML_VERSION >= (4, 10, 0)
+    | Pmty_functor (param, mt) ->
+        functor_ ~loc ~attrs
+          (map_functor_param sub param)
+          (sub # module_type mt)
+#else
     | Pmty_functor (s, mt1, mt2) ->
         functor_ ~loc ~attrs (map_loc sub s)
           (map_opt (sub # module_type) mt1)
           (sub # module_type mt2)
+#endif
     | Pmty_with (mt, l) ->
         with_ ~loc ~attrs (sub # module_type mt)
           (List.map (sub # with_constraint) l)
@@ -227,10 +240,17 @@ module M = struct
     match desc with
     | Pmod_ident x -> ident ~loc ~attrs (map_loc sub x)
     | Pmod_structure str -> structure ~loc ~attrs (sub # structure str)
+#if OCAML_VERSION >= (4, 10, 0)
+    | Pmod_functor (param, body) ->
+        functor_ ~loc ~attrs
+          (map_functor_param sub param)
+          (sub # module_expr body)
+#else
     | Pmod_functor (arg, arg_ty, body) ->
         functor_ ~loc ~attrs (map_loc sub arg)
           (map_opt (sub # module_type) arg_ty)
           (sub # module_expr body)
+#endif
     | Pmod_apply (m1, m2) ->
         apply ~loc ~attrs (sub # module_expr m1) (sub # module_expr m2)
     | Pmod_constraint (m, mty) ->

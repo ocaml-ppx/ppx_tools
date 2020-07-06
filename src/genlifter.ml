@@ -50,7 +50,11 @@ module Main : sig end = struct
     if Hashtbl.mem printed ty then ()
     else let tylid = Longident.parse ty in
       let td =
+#if OCAML_VERSION >= (4, 10, 0)
+        try snd (Env.find_type_by_name tylid env)
+#else
         try Env.find_type (Env.lookup_type tylid env) env
+#endif
         with Not_found ->
           Format.eprintf "** Cannot resolve type %s@." ty;
           exit 2
