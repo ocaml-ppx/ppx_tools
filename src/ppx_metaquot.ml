@@ -69,7 +69,7 @@ end = struct
 
   let prefix ty s =
     let open Longident in
-    match parse ty with
+    match Longident.parse ty [@ocaml.warning "-3"] with
     | Ldot(m, _) -> String.concat "." (Longident.flatten m) ^ "." ^ s
     | _ -> s
 

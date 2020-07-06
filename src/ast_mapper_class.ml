@@ -619,6 +619,14 @@ class mapper =
       | PTyp x -> PTyp (this # typ x)
       | PPat (x, g) -> PPat (this # pat x, map_opt (this # expr) g)
       | PSig x -> PSig (this # signature x)
+
+#if OCAML_VERSION >= (4, 11, 0)
+    method constant = function
+      | Pconst_integer (str, suffix) -> Pconst_integer (str, suffix)
+      | Pconst_char c -> Pconst_char c
+      | Pconst_string (str, loc, delim) -> Pconst_string (str, this # location loc, delim)
+      | Pconst_float (str, suffix) -> Pconst_float (str, suffix)
+#endif
   end
 
 
@@ -639,6 +647,9 @@ let to_mapper this =
     class_type = (fun _ -> this # class_type);
     class_type_declaration = (fun _ -> this # class_type_declaration);
     class_type_field = (fun _ -> this # class_type_field);
+#if OCAML_VERSION >= (4, 11, 0)
+    constant = (fun _ -> this # constant);
+#endif
     constructor_declaration = (fun _ -> this # constructor_declaration);
     expr = (fun _ -> this # expr);
     extension = (fun _ -> this # extension);
