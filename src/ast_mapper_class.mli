@@ -22,6 +22,9 @@ class mapper:
     method class_type: class_type -> class_type
     method class_type_declaration: class_type_declaration -> class_type_declaration
     method class_type_field: class_type_field -> class_type_field
+#if OCAML_VERSION >= (4, 11, 0)
+    method constant : constant -> constant
+#endif
     method constructor_arguments: constructor_arguments -> constructor_arguments
     method constructor_declaration: constructor_declaration -> constructor_declaration
     method expr: expression -> expression

@@ -11,4 +11,5 @@ build: ["dune" "build" "-p" name "-j" jobs]
 depends: [
   "ocaml" {>= "4.08.0" & < "4.12.0"}
   "dune" {>= "1.6"}
+  "cppo" {build}
 ]

@@ -29,7 +29,11 @@ module Constant = struct
   type t = Parsetree.constant =
      Pconst_integer of string * char option
    | Pconst_char of char
+#if OCAML_VERSION >= (4, 11, 0)
+   | Pconst_string of string * Location.t * string option
+#else
    | Pconst_string of string * string option
+#endif
    | Pconst_float of string * char option
 
   let of_constant x = x
@@ -43,7 +47,7 @@ let may_tuple ?loc tup = function
   | [x] -> Some x
   | l -> Some (tup ?loc ?attrs:None l)
 
-let lid ?(loc = !default_loc) s = mkloc (Longident.parse s) loc
+let lid ?(loc = !default_loc) s = mkloc (Longident.parse s) loc [@ocaml.warning "-3"]
 let constr ?loc ?attrs s args = Exp.construct ?loc ?attrs (lid ?loc s) (may_tuple ?loc Exp.tuple args)
 let nil ?loc ?attrs () = constr ?loc ?attrs "[]" []
 let unit ?loc ?attrs () = constr ?loc ?attrs "()" []
@@ -53,7 +57,11 @@ let tuple ?loc ?attrs = function
   | xs -> Exp.tuple ?loc ?attrs xs
 let cons ?loc ?attrs hd tl = constr ?loc ?attrs "::" [hd; tl]
 let list ?loc ?attrs l = List.fold_right (cons ?loc ?attrs) l (nil ?loc ?attrs ())
+#if OCAML_VERSION >= (4, 11, 0)
+let str ?(loc = !default_loc) ?attrs s = Exp.constant ~loc ?attrs (Pconst_string (s, loc, None))
+#else
 let str ?loc ?attrs s = Exp.constant ?loc ?attrs (Pconst_string (s, None))
+#endif
 let int ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_integer (string_of_int x, None))
 let int32 ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_integer (Int32.to_string x, Some 'l'))
 let int64 ?loc ?attrs x = Exp.constant ?loc ?attrs (Pconst_integer (Int64.to_string x, Some 'L'))
@@ -85,7 +93,11 @@ let ptuple ?loc ?attrs = function
   | xs -> Pat.tuple ?loc ?attrs xs
 let plist ?loc ?attrs l = List.fold_right (pcons ?loc ?attrs) l (pnil ?loc ?attrs ())
 
+#if OCAML_VERSION >= (4, 11, 0)
+let pstr ?(loc = !default_loc) ?attrs s = Pat.constant ~loc ?attrs (Pconst_string (s, loc, None))
+#else
 let pstr ?loc ?attrs s = Pat.constant ?loc ?attrs (Pconst_string (s, None))
+#endif
 let pint ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_integer (string_of_int x, None))
 let pchar ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_char x)
 let pfloat ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_float (string_of_float x, None))
@@ -93,11 +105,19 @@ let pfloat ?loc ?attrs x = Pat.constant ?loc ?attrs (Pconst_float (string_of_flo
 let tconstr ?loc ?attrs c l = Typ.constr ?loc ?attrs (lid ?loc c) l
 
 let get_str = function
+#if OCAML_VERSION >= (4, 11, 0)
+  | {pexp_desc=Pexp_constant (Pconst_string (s, _, _)); _} -> Some s
+#else
   | {pexp_desc=Pexp_constant (Pconst_string (s, _)); _} -> Some s
+#endif
   | _ -> None
 
 let get_str_with_quotation_delimiter = function
+#if OCAML_VERSION >= (4, 11, 0)
+  | {pexp_desc=Pexp_constant (Pconst_string (s, _, d)); _} -> Some (s, d)
+#else
   | {pexp_desc=Pexp_constant (Pconst_string (s, d)); _} -> Some (s, d)
+#endif
   | _ -> None
 
 let get_lid = function
