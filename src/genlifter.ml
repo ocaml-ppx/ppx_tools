@@ -225,7 +225,11 @@ module Main : sig end = struct
         meths
     in
     let cl = Cstr.mk (pvar "this") meths in
+#if OCAML_VERSION >= (4, 12, 0)
+    let params = [Typ.var "res", (NoVariance, NoInjectivity)] in
+#else
     let params = [Typ.var "res", Invariant] in
+#endif
     let cl = Ci.mk ~virt:Virtual ~params (mknoloc "lifter") (Cl.structure cl) in
     let s = [Str.class_ [cl]] in
     Format.printf "%a@." Pprintast.structure (simplify.Ast_mapper.structure simplify s)
