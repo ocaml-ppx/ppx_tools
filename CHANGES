@@ -1,0 +1,4 @@
+6.3 (16/11/2020)
+----------------
+
+  * Add support for OCaml 4.12 (#88, Kate Deplaix)
