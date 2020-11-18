@@ -2,3 +2,5 @@
 ----------------
 
   * Add support for OCaml 4.12 (#88, Kate Deplaix)
+  * Merge the different implementations into a common folder (#87, Kate Deplaix)
+    - ppx_tools now requires cppo to build
