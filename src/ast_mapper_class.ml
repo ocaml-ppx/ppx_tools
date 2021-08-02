@@ -16,6 +16,14 @@ let map_opt f = function None -> None | Some x -> Some (f x)
 
 let map_loc sub {loc; txt} = {loc = sub # location loc; txt}
 
+#if OCAML_VERSION >= (4, 13, 0)
+let map_pat_opt sub f = function
+  | None -> None
+  | Some (exist, x) -> Some (List.map (map_loc sub) exist, f x)
+#else
+let map_pat_opt _sub f x = map_opt f x
+#endif
+
 module T = struct
   (* Type expressions for the core language *)
 
@@ -205,6 +213,12 @@ module MT = struct
         Pwith_typesubst (map_loc sub lid, sub # type_declaration d)
     | Pwith_modsubst (lid, lid2) ->
         Pwith_modsubst (map_loc sub lid, map_loc sub lid2)
+#if OCAML_VERSION >= (4, 13, 0)
+    | Pwith_modtype (lid, mty) ->
+        Pwith_modtype (map_loc sub lid, sub # module_type mty)
+    | Pwith_modtypesubst (lid, mty) ->
+        Pwith_modtypesubst (map_loc sub lid, sub # module_type mty)
+#endif
 
   let map_signature_item sub {psig_desc = desc; psig_loc = loc} =
     let open Sig in
@@ -217,6 +231,9 @@ module MT = struct
     | Psig_exception texn -> exception_ ~loc (sub # type_exception texn)
     | Psig_module x -> module_ ~loc (sub # module_declaration x)
     | Psig_modsubst ms -> mod_subst ~loc (sub # module_substitution ms)
+#if OCAML_VERSION >= (4, 13, 0)
+    | Psig_modtypesubst ms -> modtype_subst ~loc (sub # module_type_declaration ms)
+#endif
     | Psig_recmodule l ->
         rec_module ~loc (List.map (sub # module_declaration) l)
     | Psig_modtype x -> modtype ~loc (sub # module_type_declaration x)
@@ -382,7 +399,7 @@ module P = struct
     | Ppat_interval (c1, c2) -> interval ~loc ~attrs c1 c2
     | Ppat_tuple pl -> tuple ~loc ~attrs (List.map (sub # pat) pl)
     | Ppat_construct (l, p) ->
-        construct ~loc ~attrs (map_loc sub l) (map_opt (sub # pat) p)
+        construct ~loc ~attrs (map_loc sub l) (map_pat_opt sub (sub # pat) p)
     | Ppat_variant (l, p) -> variant ~loc ~attrs l (map_opt (sub # pat) p)
     | Ppat_record (lpl, cf) ->
         record ~loc ~attrs (List.map (map_tuple (map_loc sub) (sub # pat)) lpl)
