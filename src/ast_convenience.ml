@@ -47,6 +47,15 @@ let may_tuple ?loc tup = function
   | [x] -> Some x
   | l -> Some (tup ?loc ?attrs:None l)
 
+#if OCAML_VERSION >= (4, 13, 0)
+let may_pat_tuple ?loc tup = function
+  | [] -> None
+  | [x] -> Some ([], x)
+  | l -> Some ([], tup ?loc ?attrs:None l)
+#else
+let may_pat_tuple ?loc tup x = may_tuple ?loc tup x
+#endif
+
 let lid ?(loc = !default_loc) s = mkloc (Longident.parse s) loc [@ocaml.warning "-3"]
 let constr ?loc ?attrs s args = Exp.construct ?loc ?attrs (lid ?loc s) (may_tuple ?loc Exp.tuple args)
 let nil ?loc ?attrs () = constr ?loc ?attrs "[]" []
@@ -81,7 +90,7 @@ let sequence ?loc ?attrs = function
   | hd :: tl -> List.fold_left (fun e1 e2 -> Exp.sequence ?loc ?attrs e1 e2) hd tl
 
 let pvar ?(loc = !default_loc) ?attrs s = Pat.var ~loc ?attrs (mkloc s loc)
-let pconstr ?loc ?attrs s args = Pat.construct ?loc ?attrs (lid ?loc s) (may_tuple ?loc Pat.tuple args)
+let pconstr ?loc ?attrs s args = Pat.construct ?loc ?attrs (lid ?loc s) (may_pat_tuple ?loc Pat.tuple args)
 let precord ?loc ?attrs ?(closed = Open) l =
   Pat.record ?loc ?attrs (List.map (fun (s, e) -> (lid ~loc:e.ppat_loc s, e)) l) closed
 let pnil ?loc ?attrs () = pconstr ?loc ?attrs "[]" []
