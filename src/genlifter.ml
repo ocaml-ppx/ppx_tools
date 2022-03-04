@@ -19,6 +19,15 @@ module Main : sig end = struct
 
   (*************************************************************************)
 
+  module Compat = struct
+#if OCAML_VERSION >= (4, 14, 0)
+    let get_desc = Types.get_desc
+    let repr = Transient_expr.repr
+#else
+    let get_desc x = x.desc
+    let repr x = x
+#endif
+  end
 
   let env = Env.initial_safe_string
 
@@ -68,7 +77,7 @@ module Main : sig end = struct
       in
       Hashtbl.add printed ty ();
       let params = List.mapi (fun i _ -> mknoloc (Printf.sprintf "f%i" i)) td.type_params in
-      let env = List.map2 (fun s t -> t.id, evar s.txt) params td.type_params in
+      let env = List.map2 (fun s t -> (Compat.repr t).id, evar s.txt) params td.type_params in
       let make_result_t tyargs = Typ.(arrow Asttypes.Nolabel (constr (lid ty) tyargs) (var "res")) in
       let make_t tyargs =
         List.fold_right
@@ -140,9 +149,9 @@ module Main : sig end = struct
     List.split (List.mapi arg tl)
 
   and tyexpr env ty x =
-    match ty.desc with
+    match Compat.get_desc ty with
     | Tvar _ ->
-        (match List.assoc ty.id env with
+        (match List.assoc (Compat.repr ty).id env with
          | f -> app f [x]
          | exception Not_found ->
              use_existentials := true;
