@@ -29,7 +29,11 @@ module Main : sig end = struct
 #endif
   end
 
+#if OCAML_VERSION >= (5, 0, 0)
+  let env = Env.initial
+#else
   let env = Env.initial_safe_string
+#endif
 
   let clean s =
     let s = Bytes.of_string s in
@@ -222,7 +226,11 @@ module Main : sig end = struct
     Printf.sprintf "%s [options] <type names>\n" Sys.argv.(0)
 
   let main () =
+#if OCAML_VERSION >= (5, 0, 0)
+    Load_path.init ~auto_include:Load_path.no_auto_include [Config.standard_library];
+#else
     Load_path.init [Config.standard_library];
+#endif
     Arg.parse (Arg.align args) gen usage;
     let meths = !meths in
     let meths =
