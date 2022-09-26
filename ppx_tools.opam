@@ -1,4 +1,5 @@
 opam-version: "2.0"
+version: "6.6"
 synopsis: "Tools for authors of ppx rewriters and other syntactic tools"
 maintainer: "Kate <kit.ty.kate@disroot.org>"
 authors: "Alain Frisch <alain.frisch@lexifi.com>"
